@@ -6,6 +6,4 @@
 **Tools and Library Usage**
 
  - glMatrix
- 
- 
 

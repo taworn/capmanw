@@ -63,50 +63,56 @@ function init() {
 
     // timer
     var angle = 0.0;
-    var angleToPlus = 1.0;
-    var lastTick = 0;
+    var angleToPlus = 5.0;
+    var timeStart = performance.now();
+    var frameCount = 0;
 
-    var draw = function (time) {
-        if (time - lastTick > 1) {
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    var draw = function (currentTime) {
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-            // model matrix
-            modelMatrix = mat4.create();
-            mat4.rotate(modelMatrix, modelMatrix, angle * (Math.PI / 180), vec3.fromValues(0, 1, 0));
-            angle += angleToPlus;
-            if (angle > 89.0 || angle < -89.0)
-                angleToPlus = -angleToPlus;
-            console.log("modelMatrix: " + mat4.str(modelMatrix));
+        // model matrix
+        modelMatrix = mat4.create();
+        mat4.rotate(modelMatrix, modelMatrix, angle * (Math.PI / 180), vec3.fromValues(0, 1, 0));
+        angle += angleToPlus;
+        if (angle > 89.0 || angle < -89.0)
+            angleToPlus = -angleToPlus;
+        //console.log("modelMatrix: " + mat4.str(modelMatrix));
 
-            // view matrix
-            mat4.lookAt(viewMatrix
-                    , vec3.fromValues(0, 0, 1.5)
-                    , vec3.fromValues(0, 0, -5)
-                    , vec3.fromValues(0, 1, 0));
-            console.log("viewMatrix: " + mat4.str(viewMatrix));
+        // view matrix
+        mat4.lookAt(viewMatrix
+                , vec3.fromValues(0, 0, 1.5)
+                , vec3.fromValues(0, 0, -5)
+                , vec3.fromValues(0, 1, 0));
+        //console.log("viewMatrix: " + mat4.str(viewMatrix));
 
-            // projection matrix
-            mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, -1.0, 25.0);
-            console.log("projectionMatrix: " + mat4.str(projectionMatrix));
+        // projection matrix
+        mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, -1.0, 25.0);
+        //console.log("projectionMatrix: " + mat4.str(projectionMatrix));
 
-            // combines model, view, projection matrices
-            mat4.multiply(mvpMatrix, projectionMatrix, viewMatrix);
-            mat4.multiply(mvpMatrix, mvpMatrix, modelMatrix);
-            console.log("mvpMatrix: " + mat4.str(mvpMatrix));
-            console.log("");
+        // combines model, view, projection matrices
+        mat4.multiply(mvpMatrix, projectionMatrix, viewMatrix);
+        mat4.multiply(mvpMatrix, mvpMatrix, modelMatrix);
+        //console.log("mvpMatrix: " + mat4.str(mvpMatrix));
+        //console.log("");
 
-            gl.enableVertexAttribArray(0);
-            gl.bindBuffer(gl.ARRAY_BUFFER, verticesId);
-            gl.vertexAttribPointer(positionHandle, 3, gl.FLOAT, false, 7 * 4, 0 * 4);
-            gl.enableVertexAttribArray(positionHandle);
-            gl.vertexAttribPointer(colorHandle, 4, gl.FLOAT, false, 7 * 4, 3 * 4);
-            gl.enableVertexAttribArray(colorHandle);
-            gl.uniformMatrix4fv(mvpMatrixHandle, false, mvpMatrix);
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-            gl.disableVertexAttribArray(0);
+        gl.enableVertexAttribArray(0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, verticesId);
+        gl.vertexAttribPointer(positionHandle, 3, gl.FLOAT, false, 7 * 4, 0 * 4);
+        gl.enableVertexAttribArray(positionHandle);
+        gl.vertexAttribPointer(colorHandle, 4, gl.FLOAT, false, 7 * 4, 3 * 4);
+        gl.enableVertexAttribArray(colorHandle);
+        gl.uniformMatrix4fv(mvpMatrixHandle, false, mvpMatrix);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(0);
 
-            lastTick = time;
+        frameCount++;
+        var timeUsage = currentTime - timeStart;
+        if (timeUsage > 1000) {
+            var fps = frameCount * 1000 / timeUsage;
+            console.log("FPS: " + fps);
+            timeStart = currentTime;
+            frameCount = 0;
         }
         window.requestAnimationFrame(draw);
     };
