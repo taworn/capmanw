@@ -27,6 +27,8 @@ PlayScene.prototype = new Scene();
 
 PlayScene.prototype.finish = function () {
     console.log("finish() called");
+    var gl = Game.instance().getGL();
+    gl.deleteBuffer(this.verticesId);
 };
 
 PlayScene.prototype.handleKey = function (e) {
