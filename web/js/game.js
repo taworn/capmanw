@@ -1,17 +1,88 @@
-/* global mat4, vec3 */
+/* global mat4, vec3, Scene */
 
 window.onload = function () {
     var game = new Game();
     game.go();
 };
 
+var SCENE_DEFAULT = 0;
+var SCENE_TITLE = 1;
+var SCENE_PLAY = 2;
+
 function Game() {
     Game.singleton = this;
 
-    this.canvas = document.getElementById('canvas');
-    this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
-    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    this.canvasGraphics = document.getElementById('canvas0');
+    this.gl = this.canvasGraphics.getContext('webgl') || this.canvasGraphics.getContext('experimental-webgl');
+    this.gl.viewport(0, 0, this.canvasGraphics.width, this.canvasGraphics.height);
 
+    this.canvasText = document.getElementById('canvas1');
+    this.context = this.canvasText.getContext('2d');
+
+    this.init();
+    this.scene = new TitleScene();
+    this.scene.init();
+}
+
+Game.prototype.handleKey = function (e) {
+    this.scene.handleKey(e);
+};
+
+Game.prototype.render = function () {
+    this.context.clearRect(0, 0, this.canvasText.width, this.canvasText.height);
+    this.scene.render();
+    var self = this;
+    window.requestAnimationFrame(function () {
+        self.render();
+    });
+};
+
+Game.prototype.getGL = function () {
+    return this.gl;
+};
+
+Game.prototype.getContext = function () {
+    return this.context;
+};
+
+Game.prototype.getPositionHandle = function () {
+    return this.positionHandle;
+};
+
+Game.prototype.getColorHandle = function () {
+    return this.colorHandle;
+};
+
+Game.prototype.getMVPMatrixHandle = function () {
+    return this.mvpMatrixHandle;
+};
+
+Game.prototype.getScreenWidth = function () {
+    return this.canvasGraphics.width;
+};
+
+Game.prototype.getScreenHeight = function () {
+    return this.canvasGraphics.height;
+};
+
+Game.prototype.changeScene = function (sceneId) {
+    this.scene.finish();
+    switch (sceneId) {
+        case SCENE_TITLE:
+            this.scene = new TitleScene();
+            break;
+        case SCENE_PLAY:
+            this.scene = new PlayScene();
+            break;
+        case SCENE_DEFAULT:
+        default:
+            this.scene = new Scene();
+            break;
+    }
+    this.scene.init();
+};
+
+Game.prototype.init = function () {
     // vertex shader and fragment shader
     var vertexShader = ""
             + "uniform mat4 u_MVPMatrix;  \n"  // A constant representing the combined model/view/projection matrix.
@@ -43,52 +114,13 @@ function Game() {
     this.positionHandle = this.gl.getAttribLocation(this.programHandle, "a_Position");
     this.colorHandle = this.gl.getAttribLocation(this.programHandle, "a_Color");
     this.gl.useProgram(this.programHandle);
-
-    this.scene = new TitleScene();
-}
+};
 
 Game.prototype.loadShader = function (shaderType, sourceCode) {
     var id = this.gl.createShader(shaderType);
     this.gl.shaderSource(id, sourceCode);
     this.gl.compileShader(id);
     return id;
-};
-
-Game.prototype.getGL = function () {
-    return this.gl;
-}
-
-Game.prototype.getMVPMatrixHandle = function () {
-    return this.mvpMatrixHandle;
-};
-
-Game.prototype.getPositionHandle = function () {
-    return this.positionHandle;
-};
-
-Game.prototype.getColorHandle = function () {
-    return this.colorHandle;
-};
-
-Game.prototype.currentScene = function () {
-    return this.scene;
-};
-
-Game.prototype.changeScene = function (newScene) {
-    this.scene.finish();
-    this.scene = newScene;
-};
-
-Game.prototype.handleKey = function (e) {
-    this.scene.handleKey(e);
-};
-
-Game.prototype.render = function (timeCurrent) {
-    this.scene.render(timeCurrent);
-    var self = this;
-    window.requestAnimationFrame(function () {
-        self.render(performance.now());
-    });
 };
 
 Game.prototype.go = function () {

@@ -1,7 +1,14 @@
-/* global mat4, vec3 */
+/* global mat4, vec3, Game, Scene, SCENE_TITLE */
 
 function PlayScene() {
     console.log("PlayScene created");
+}
+
+PlayScene.prototype = new Scene();
+
+PlayScene.prototype.init = function () {
+    Scene.prototype.init();
+    console.log("init() called");
 
     this.modelX = 0.0;
     this.modelY = 0.0;
@@ -11,7 +18,7 @@ function PlayScene() {
     this.angleToPlus = 5.0;
 
     // generates buffer
-    var gl = Game.instance().getGL();
+    var gl = this.getGL();
     var verticesData = [
         // X, Y, Z, R, G, B, A
         -1.0, -1.0, 0.0, 1.0, 0.0, 0.0, 1.0,
@@ -21,14 +28,12 @@ function PlayScene() {
     this.verticesId = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesId);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesData), gl.STATIC_DRAW);
-}
-
-PlayScene.prototype = new Scene();
+};
 
 PlayScene.prototype.finish = function () {
     console.log("finish() called");
-    var gl = Game.instance().getGL();
-    gl.deleteBuffer(this.verticesId);
+    this.getGL().deleteBuffer(this.verticesId);
+    Scene.prototype.finish();
 };
 
 PlayScene.prototype.handleKey = function (e) {
@@ -53,12 +58,12 @@ PlayScene.prototype.handleKey = function (e) {
     }
     else if (e.keyCode === 13) {
         console.log("key ENTER");
-        Game.instance().changeScene(new TitleScene());
+        Game.instance().changeScene(SCENE_TITLE);
     }
 };
 
-PlayScene.prototype.render = function (timeCurrent) {
-    var gl = Game.instance().getGL();
+PlayScene.prototype.render = function () {
+    var gl = this.getGL();
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -100,14 +105,15 @@ PlayScene.prototype.render = function (timeCurrent) {
 
     gl.enableVertexAttribArray(0);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesId);
-    gl.vertexAttribPointer(Game.instance().getPositionHandle(), 3, gl.FLOAT, false, 7 * 4, 0 * 4);
-    gl.enableVertexAttribArray(Game.instance().getPositionHandle());
-    gl.vertexAttribPointer(Game.instance().getColorHandle(), 4, gl.FLOAT, false, 7 * 4, 3 * 4);
-    gl.enableVertexAttribArray(Game.instance().getColorHandle());
-    gl.uniformMatrix4fv(Game.instance().getMVPMatrixHandle(), false, mvpMatrix);
+    gl.vertexAttribPointer(this.getPositionHandle(), 3, gl.FLOAT, false, 7 * 4, 0 * 4);
+    gl.enableVertexAttribArray(this.getPositionHandle());
+    gl.vertexAttribPointer(this.getColorHandle(), 4, gl.FLOAT, false, 7 * 4, 3 * 4);
+    gl.enableVertexAttribArray(this.getColorHandle());
+    gl.uniformMatrix4fv(this.getMVPMatrixHandle(), false, mvpMatrix);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     gl.disableVertexAttribArray(0);
 
-    this.fps(timeCurrent);
+    this.computeFPS();
+    this.drawFPS();
 };
 
