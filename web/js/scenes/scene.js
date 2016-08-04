@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game */
+/* global mat4, vec3, NormalShader, Game */
 
 function Scene() {
     console.log("Scene created");
@@ -10,14 +10,12 @@ Scene.prototype.init = function () {
     var game = Game.instance();
     this.context = game.getContext();
     this.gl = game.getGL();
-    this.positionHandle = game.getPositionHandle();
-    this.colorHandle = game.getColorHandle();
-    this.mvpMatrixHandle = game.getMVPMatrixHandle();
+    this.normalShader = game.getNormalShader();
     this.screenWidth = game.getScreenWidth();
     this.screenHeight = game.getScreenHeight();
 
-    this.frameCount = 0;
     this.fps = 0;
+    this.frameCount = 0;
     this.timeStart = performance.now();
 };
 
@@ -33,16 +31,8 @@ Scene.prototype.getContext = function () {
     return this.context;
 };
 
-Scene.prototype.getPositionHandle = function () {
-    return this.positionHandle;
-};
-
-Scene.prototype.getColorHandle = function () {
-    return this.colorHandle;
-};
-
-Scene.prototype.getMVPMatrixHandle = function () {
-    return this.mvpMatrixHandle;
+Scene.prototype.getNormalShader = function () {
+    return this.normalShader;
 };
 
 Scene.prototype.getScreenWidth = function () {
@@ -68,12 +58,10 @@ Scene.prototype.computeFPS = function () {
         this.frameCount = 0;
         console.log("FPS: " + this.fps);
     }
-};
 
-Scene.prototype.drawFPS = function () {
     var context = this.getContext();
     context.font = "normal 24px sans-serif";
-    context.fillStyle = "#ffffff";
+    context.fillStyle = "rgba(255, 255, 255, 0.5)";
     context.textAlign = "right";
     context.fillText(this.getFPS(), this.getScreenWidth(), this.getScreenHeight());
 };
@@ -88,6 +76,5 @@ Scene.prototype.render = function () {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     this.computeFPS();
-    this.drawFPS();
 };
 

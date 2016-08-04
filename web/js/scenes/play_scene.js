@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, Scene, SCENE_TITLE */
+/* global mat4, vec3, Game, NormalShader, Scene, SCENE_TITLE */
 
 function PlayScene() {
     console.log("PlayScene created");
@@ -67,6 +67,9 @@ PlayScene.prototype.render = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
+    var normalShader = this.getNormalShader();
+    normalShader.useProgram(gl);
+
     // model matrix
     var translateMatrix = mat4.create();
     mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX + this.modelDx, this.modelY + this.modelDy, 0));
@@ -105,15 +108,14 @@ PlayScene.prototype.render = function () {
 
     gl.enableVertexAttribArray(0);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesId);
-    gl.vertexAttribPointer(this.getPositionHandle(), 3, gl.FLOAT, false, 7 * 4, 0 * 4);
-    gl.enableVertexAttribArray(this.getPositionHandle());
-    gl.vertexAttribPointer(this.getColorHandle(), 4, gl.FLOAT, false, 7 * 4, 3 * 4);
-    gl.enableVertexAttribArray(this.getColorHandle());
-    gl.uniformMatrix4fv(this.getMVPMatrixHandle(), false, mvpMatrix);
+    gl.vertexAttribPointer(normalShader.getPosition(), 3, gl.FLOAT, false, 7 * 4, 0 * 4);
+    gl.enableVertexAttribArray(normalShader.getPosition());
+    gl.vertexAttribPointer(normalShader.getColor(), 4, gl.FLOAT, false, 7 * 4, 3 * 4);
+    gl.enableVertexAttribArray(normalShader.getColor());
+    gl.uniformMatrix4fv(normalShader.getMVPMatrix(), false, mvpMatrix);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     gl.disableVertexAttribArray(0);
 
     this.computeFPS();
-    this.drawFPS();
 };
 
