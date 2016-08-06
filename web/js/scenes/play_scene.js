@@ -1,5 +1,8 @@
 /* global mat4, vec3, Game, NormalShader, Scene, SCENE_TITLE */
 
+/**
+ * Playing game scene.
+ */
 function PlayScene() {
     console.log("PlayScene created");
 }

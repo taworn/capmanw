@@ -9,6 +9,9 @@ var SCENE_DEFAULT = 0;
 var SCENE_TITLE = 1;
 var SCENE_PLAY = 2;
 
+/**
+ * A simple game engine class.
+ */
 function Game() {
     Game.singleton = this;
 
@@ -26,10 +29,37 @@ function Game() {
     this.scene.init();
 }
 
+/**
+ * Changes the new scene.
+ * @param sceneId A scene identifier, look at SCENE_*.
+ */
+Game.prototype.changeScene = function (sceneId) {
+    this.scene.finish();
+    switch (sceneId) {
+        default:
+        case SCENE_DEFAULT:
+            this.scene = new Scene();
+            break;
+        case SCENE_TITLE:
+            this.scene = new TitleScene();
+            break;
+        case SCENE_PLAY:
+            this.scene = new PlayScene();
+            break;
+    }
+    this.scene.init();
+};
+
+/**
+ * Called when user press keyboard.
+ */
 Game.prototype.handleKey = function (e) {
     this.scene.handleKey(e);
 };
 
+/**
+ * Called every render frame.
+ */
 Game.prototype.render = function () {
     this.context.clearRect(0, 0, this.canvasText.width, this.canvasText.height);
     this.scene.render();
@@ -57,23 +87,6 @@ Game.prototype.getScreenWidth = function () {
 
 Game.prototype.getScreenHeight = function () {
     return this.canvasGraphics.height;
-};
-
-Game.prototype.changeScene = function (sceneId) {
-    this.scene.finish();
-    switch (sceneId) {
-        default:
-        case SCENE_DEFAULT:
-            this.scene = new Scene();
-            break;
-        case SCENE_TITLE:
-            this.scene = new TitleScene();
-            break;
-        case SCENE_PLAY:
-            this.scene = new PlayScene();
-            break;
-    }
-    this.scene.init();
 };
 
 Game.prototype.go = function () {
