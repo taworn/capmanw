@@ -9,6 +9,7 @@ function Shader() {
 
 /**
  * Initializes shader programs.
+ * @param gl A OpenGL context.
  * @param vertexSourceCode   A vertex shader source code.
  * @param fragmentSourceCode A fragment shader source code.
  * @return Returns true if successful, otherwise, it is false.
@@ -34,6 +35,7 @@ Shader.prototype.load = function (gl, vertexSourceCode, fragmentSourceCode) {
 
 /**
  * Loads shader program.
+ * @param gl A OpenGL context.
  * @param shaderType A shader program type.
  * @param sourceCode A shader source code.
  */
@@ -46,8 +48,16 @@ Shader.prototype.loadShader = function (gl, shaderType, sourceCode) {
 
 /**
  * Uses this program.
+ * @param gl A OpenGL context.
  */
 Shader.prototype.useProgram = function (gl) {
     return gl.useProgram(this.program);
+};
+
+/**
+ * Gets this program.
+ */
+Shader.prototype.getProgram = function () {
+    return this.program;
 };
 

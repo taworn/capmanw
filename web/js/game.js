@@ -1,4 +1,4 @@
-/* global mat4, vec3, Shader, NormalShader, Scene */
+/* global mat4, vec3, Shader, NormalShader, TextureShader, Scene */
 
 window.onload = function () {
     var game = new Game();
@@ -24,6 +24,9 @@ function Game() {
 
     this.normalShader = new NormalShader();
     this.normalShader.init(this.gl);
+    
+    this.textureShader = new TextureShader();
+    this.textureShader.init(this.gl);
 
     this.scene = new TitleScene();
     this.scene.init();
@@ -79,6 +82,10 @@ Game.prototype.getContext = function () {
 
 Game.prototype.getNormalShader = function () {
     return this.normalShader;
+};
+
+Game.prototype.getTextureShader = function () {
+    return this.textureShader;
 };
 
 Game.prototype.getScreenWidth = function () {
