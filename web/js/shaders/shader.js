@@ -54,10 +54,3 @@ Shader.prototype.useProgram = function (gl) {
     return gl.useProgram(this.program);
 };
 
-/**
- * Gets this program.
- */
-Shader.prototype.getProgram = function () {
-    return this.program;
-};
-

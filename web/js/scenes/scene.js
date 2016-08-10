@@ -13,13 +13,16 @@ function Scene() {
 Scene.prototype.init = function () {
     console.log("init() called");
 
-    var game = Game.instance();
-    this.context = game.getContext();
-    this.gl = game.getGL();
-    this.normalShader = game.getNormalShader();
-    this.textureShader = game.getTextureShader();
-    this.screenWidth = game.getScreenWidth();
-    this.screenHeight = game.getScreenHeight();
+    // combines matrices
+    var viewMatrix = mat4.create();
+    mat4.lookAt(viewMatrix
+            , vec3.fromValues(0, 0, 1.5)
+            , vec3.fromValues(0, 0, -5)
+            , vec3.fromValues(0, 1, 0));
+    var projectionMatrix = mat4.create();
+    mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, -1.0, 25.0);
+    this.viewAndProjectMatrix = mat4.create();
+    mat4.multiply(this.viewAndProjectMatrix, projectionMatrix, viewMatrix);
 
     this.fps = 0;
     this.frameCount = 0;
@@ -48,11 +51,12 @@ Scene.prototype.computeFPS = function () {
         console.log("FPS: " + this.fps);
     }
 
-    var context = this.getContext();
+    var game = Game.instance();
+    var context = game.getContext();
     context.font = "normal 24px sans-serif";
     context.fillStyle = "rgba(255, 255, 255, 0.5)";
     context.textAlign = "right";
-    context.fillText(this.getFPS(), this.getScreenWidth(), this.getScreenHeight());
+    context.fillText(this.fps, game.getScreenWidth(), game.getScreenHeight());
 };
 
 /**
@@ -66,38 +70,10 @@ Scene.prototype.handleKey = function (e) {
  * Called every render frame.
  */
 Scene.prototype.render = function () {
-    var gl = this.getGL();
+    var gl = Game.instance().getGL();
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     this.computeFPS();
-};
-
-Scene.prototype.getGL = function () {
-    return this.gl;
-};
-
-Scene.prototype.getContext = function () {
-    return this.context;
-};
-
-Scene.prototype.getNormalShader = function () {
-    return this.normalShader;
-};
-
-Scene.prototype.getTextureShader = function () {
-    return this.textureShader;
-};
-
-Scene.prototype.getScreenWidth = function () {
-    return this.screenWidth;
-};
-
-Scene.prototype.getScreenHeight = function () {
-    return this.screenHeight;
-};
-
-Scene.prototype.getFPS = function () {
-    return this.fps;
 };
 

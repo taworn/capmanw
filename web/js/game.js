@@ -24,7 +24,7 @@ function Game() {
 
     this.normalShader = new NormalShader();
     this.normalShader.init(this.gl);
-    
+
     this.textureShader = new TextureShader();
     this.textureShader.init(this.gl);
 

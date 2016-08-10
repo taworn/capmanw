@@ -21,7 +21,7 @@ PlayScene.prototype.init = function () {
     this.angleToPlus = 5.0;
 
     // generates buffer
-    var gl = this.getGL();
+    var gl = Game.instance().getGL();
     var verticesData = [
         // X, Y, Z, R, G, B, A
         -1.0, -1.0, 0.0, 1.0, 0.0, 0.0, 1.0,
@@ -35,7 +35,8 @@ PlayScene.prototype.init = function () {
 
 PlayScene.prototype.finish = function () {
     console.log("finish() called");
-    this.getGL().deleteBuffer(this.verticesId);
+    var gl = Game.instance().getGL();
+    gl.deleteBuffer(this.verticesId);
     Scene.prototype.finish();
 };
 
@@ -66,14 +67,15 @@ PlayScene.prototype.handleKey = function (e) {
 };
 
 PlayScene.prototype.render = function () {
-    var gl = this.getGL();
+    var game = Game.instance();
+    var gl = game.getGL();
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    var normalShader = this.getNormalShader();
+    var normalShader = game.getNormalShader();
     normalShader.useProgram(gl);
 
-    // model matrix
+    // model matrices
     var translateMatrix = mat4.create();
     mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX + this.modelDx, this.modelY + this.modelDy, 0));
     this.modelX += this.modelDx;
@@ -88,22 +90,8 @@ PlayScene.prototype.render = function () {
     //console.log("translateMatrix: " + mat4.str(translateMatrix));
     //console.log("rotateMatrix: " + mat4.str(rotateMatrix));
 
-    // view matrix
-    var viewMatrix = mat4.create();
-    mat4.lookAt(viewMatrix
-            , vec3.fromValues(0, 0, 1.5)
-            , vec3.fromValues(0, 0, -5)
-            , vec3.fromValues(0, 1, 0));
-    //console.log("viewMatrix: " + mat4.str(viewMatrix));
-
-    // projection matrix
-    var projectionMatrix = mat4.create();
-    mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, -1.0, 25.0);
-    //console.log("projectionMatrix: " + mat4.str(projectionMatrix));
-
-    // combines model, view, projection matrices
     var mvpMatrix = mat4.create();
-    mat4.multiply(mvpMatrix, projectionMatrix, viewMatrix);
+    mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
     mat4.multiply(mvpMatrix, mvpMatrix, rotateMatrix);
     mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
     //console.log("mvpMatrix: " + mat4.str(mvpMatrix));
@@ -111,11 +99,11 @@ PlayScene.prototype.render = function () {
 
     gl.enableVertexAttribArray(0);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesId);
-    gl.vertexAttribPointer(normalShader.getPosition(), 3, gl.FLOAT, false, 7 * 4, 0 * 4);
-    gl.enableVertexAttribArray(normalShader.getPosition());
-    gl.vertexAttribPointer(normalShader.getColor(), 4, gl.FLOAT, false, 7 * 4, 3 * 4);
-    gl.enableVertexAttribArray(normalShader.getColor());
-    gl.uniformMatrix4fv(normalShader.getMVPMatrix(), false, mvpMatrix);
+    gl.vertexAttribPointer(normalShader.position, 3, gl.FLOAT, false, 7 * 4, 0 * 4);
+    gl.enableVertexAttribArray(normalShader.position);
+    gl.vertexAttribPointer(normalShader.color, 4, gl.FLOAT, false, 7 * 4, 3 * 4);
+    gl.enableVertexAttribArray(normalShader.color);
+    gl.uniformMatrix4fv(normalShader.mvpMatrix, false, mvpMatrix);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     gl.disableVertexAttribArray(0);
 

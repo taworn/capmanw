@@ -34,15 +34,3 @@ NormalShader.prototype.init = function (gl) {
     return true;
 };
 
-NormalShader.prototype.getPosition = function () {
-    return this.position;
-};
-
-NormalShader.prototype.getColor = function () {
-    return this.color;
-};
-
-NormalShader.prototype.getMVPMatrix = function () {
-    return this.mvpMatrix;
-};
-

@@ -12,8 +12,10 @@ TitleScene.prototype = new Scene();
 TitleScene.prototype.init = function () {
     Scene.prototype.init();
     console.log("init() called");
+    
+    var gl = Game.instance().getGL();
     this.image = new Image();
-    this.texture = new Texture(this.gl);
+    this.texture = new Texture(gl);
     
     var self = this;
     this.image.onload = function () {
@@ -35,7 +37,8 @@ TitleScene.prototype.handleKey = function (e) {
 };
 
 TitleScene.prototype.render = function () {
-    var gl = this.getGL();
+    var game = Game.instance();
+    var gl = game.getGL();
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.BLEND);
@@ -46,15 +49,8 @@ TitleScene.prototype.render = function () {
     mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(-0.5 * 4, 1 * 4, 0));
     var scaleMatrix = mat4.create();
     mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.25, 0.25, 1));
-    var viewMatrix = mat4.create();
-    mat4.lookAt(viewMatrix
-            , vec3.fromValues(0, 0, 1.5)
-            , vec3.fromValues(0, 0, -5)
-            , vec3.fromValues(0, 1, 0));
-    var projectionMatrix = mat4.create();
-    mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, -1.0, 25.0);
     var mvpMatrix = mat4.create();
-    mat4.multiply(mvpMatrix, projectionMatrix, viewMatrix);
+    mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
     mat4.multiply(mvpMatrix, mvpMatrix, scaleMatrix);
     mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
 
@@ -62,15 +58,15 @@ TitleScene.prototype.render = function () {
         this.texture.draw(mvpMatrix);
     }
 
-    var context = this.getContext();
+    var context = game.getContext();
     context.font = "bold 128px serif";
     context.fillStyle = "#ffff80";
     context.textAlign = "center";
-    context.fillText("Capman", this.getScreenWidth() / 2, this.getScreenHeight() / 2 - 128);
+    context.fillText("Capman", game.getScreenWidth() / 2, game.getScreenHeight() / 2 - 128);
     context.font = "normal 32px sans-serif";
     context.fillStyle = "#ffffff";
     context.textAlign = "center";
-    context.fillText("Press ENTER to Start", this.getScreenWidth() / 2, this.getScreenHeight() / 2 + 256);
+    context.fillText("Press ENTER to Start", game.getScreenWidth() / 2, game.getScreenHeight() / 2 + 256);
 
     this.computeFPS();
 };

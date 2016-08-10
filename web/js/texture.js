@@ -58,17 +58,17 @@ Texture.prototype.draw = function (mvpMatrix) {
     
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.uniform1i(gl.getUniformLocation(this.shader.getProgram(), "uSampler"), 0);
+    gl.uniform1i(this.shader.sampler, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesId);
     // position attribute
-    gl.vertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, 20, 0);
-    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(this.shader.position, 3, gl.FLOAT, gl.FALSE, 20, 0);
+    gl.enableVertexAttribArray(this.shader.position);
     // texture coordinate attribute
-    gl.vertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, 20, 12);
-    gl.enableVertexAttribArray(1);
+    gl.vertexAttribPointer(this.shader.coord, 2, gl.FLOAT, gl.FALSE, 20, 12);
+    gl.enableVertexAttribArray(this.shader.coord);
     
-    gl.uniformMatrix4fv(gl.getUniformLocation(this.shader.getProgram(), "uMVPMatrix"), false, mvpMatrix);
+    gl.uniformMatrix4fv(this.shader.mvpMatrix, false, mvpMatrix);
 
     // drawing
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesId);
