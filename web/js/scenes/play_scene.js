@@ -1,43 +1,43 @@
-/* global mat4, vec3, Game, NormalShader, Scene, SCENE_TITLE */
+/* global mat4, vec3, Game, NormalShader, TextureShader, Scene, SCENE_TITLE */
 
 /**
  * Playing game scene.
  */
 function PlayScene() {
     console.log("PlayScene created");
-}
 
-PlayScene.prototype = new Scene();
+    var gl = Game.instance().getGL();
+    this.image = new Image();
+    this.texture = new Texture(gl);
 
-PlayScene.prototype.init = function () {
-    Scene.prototype.init();
-    console.log("init() called");
+    var self = this;
+    this.image.onload = function () {
+        self.texture.bind(self.image);
+    };
+    this.image.src = "./res/a.png";
 
     this.modelX = 0.0;
     this.modelY = 0.0;
     this.modelDx = 0.0;
     this.modelDy = 0.0;
-    this.angle = 0.0;
-    this.angleToPlus = 5.0;
 
-    // generates buffer
-    var gl = Game.instance().getGL();
-    var verticesData = [
-        // X, Y, Z, R, G, B, A
-        -1.0, -1.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-        0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0,
-        1.0, -1.0, 0.0, 0.0, 0.0, 1.0, 1.0
-    ];
-    this.verticesId = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesId);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesData), gl.STATIC_DRAW);
-};
+    // combines matrices
+    var viewMatrix = mat4.create();
+    mat4.lookAt(viewMatrix
+            , vec3.fromValues(0, 0, 1.5)
+            , vec3.fromValues(0, 0, -5)
+            , vec3.fromValues(0, 1, 0));
+    var projectionMatrix = mat4.create();
+    mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, -1.0, 25.0);
+    this.viewAndProjectMatrix = mat4.create();
+    mat4.multiply(this.viewAndProjectMatrix, projectionMatrix, viewMatrix);
+}
 
-PlayScene.prototype.finish = function () {
-    console.log("finish() called");
-    var gl = Game.instance().getGL();
-    gl.deleteBuffer(this.verticesId);
-    Scene.prototype.finish();
+PlayScene.prototype = new Scene();
+
+PlayScene.prototype.release = function () {
+    console.log("PlayScene release() called");
+    this.texture.release();
 };
 
 PlayScene.prototype.handleKey = function (e) {
@@ -46,19 +46,23 @@ PlayScene.prototype.handleKey = function (e) {
     }
     else if (e.keyCode === 87 || e.keyCode === 38) {
         console.log("key W or UP");
-        this.modelDy = -0.1;
+        this.modelDx = 0.0;
+        this.modelDy = 0.1;
     }
     else if (e.keyCode === 83 || e.keyCode === 40) {
         console.log("key S or DOWN");
-        this.modelDy = 0.1;
+        this.modelDx = 0.0;
+        this.modelDy = -0.1;
     }
     else if (e.keyCode === 65 || e.keyCode === 37) {
         console.log("key A or LEFT");
         this.modelDx = -0.1;
+        this.modelDy = 0.0;
     }
     else if (e.keyCode === 68 || e.keyCode === 39) {
         console.log("key D or RIGHT");
         this.modelDx = 0.1;
+        this.modelDy = 0.0;
     }
     else if (e.keyCode === 13) {
         console.log("key ENTER");
@@ -72,40 +76,60 @@ PlayScene.prototype.render = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    var normalShader = game.getNormalShader();
-    normalShader.useProgram(gl);
+    if (this.texture.isLoaded()) {
+        var translateMatrix = mat4.create();
+        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX, this.modelY, 0));
+        if (this.modelDx > 0.0 && this.modelX < 8.0)
+            this.modelX += this.modelDx;
+        else if (this.modelDx < 0.0 && this.modelX > -8.0)
+            this.modelX += this.modelDx;
+        if (this.modelDy > 0.0 && this.modelY < 8.0)
+            this.modelY += this.modelDy;
+        else if (this.modelDy < 0.0 && this.modelY > -8.0)
+            this.modelY += this.modelDy;
+        var scaleMatrix = mat4.create();
+        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.2, 0.2, 1.0));
+        var mvpMatrix = mat4.create();
+        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
+        mat4.multiply(mvpMatrix, mvpMatrix, scaleMatrix);
+        mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
+        this.texture.draw(mvpMatrix);
 
-    // model matrices
-    var translateMatrix = mat4.create();
-    mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX + this.modelDx, this.modelY + this.modelDy, 0));
-    this.modelX += this.modelDx;
-    this.modelY += this.modelDy;
-    this.modelDx = 0.0;
-    this.modelDy = 0.0;
-    var rotateMatrix = mat4.create();
-    mat4.rotate(rotateMatrix, rotateMatrix, this.angle * (Math.PI / 180), vec3.fromValues(0, 1, 0));
-    this.angle += this.angleToPlus;
-    if (this.angle > 89.0 || this.angle < -89.0)
-        this.angleToPlus = -this.angleToPlus;
-    //console.log("translateMatrix: " + mat4.str(translateMatrix));
-    //console.log("rotateMatrix: " + mat4.str(rotateMatrix));
-
-    var mvpMatrix = mat4.create();
-    mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
-    mat4.multiply(mvpMatrix, mvpMatrix, rotateMatrix);
-    mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
-    //console.log("mvpMatrix: " + mat4.str(mvpMatrix));
-    //console.log("");
-
-    gl.enableVertexAttribArray(0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesId);
-    gl.vertexAttribPointer(normalShader.position, 3, gl.FLOAT, false, 7 * 4, 0 * 4);
-    gl.enableVertexAttribArray(normalShader.position);
-    gl.vertexAttribPointer(normalShader.color, 4, gl.FLOAT, false, 7 * 4, 3 * 4);
-    gl.enableVertexAttribArray(normalShader.color);
-    gl.uniformMatrix4fv(normalShader.mvpMatrix, false, mvpMatrix);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-    gl.disableVertexAttribArray(0);
+        scaleMatrix = mat4.create();
+        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.1, 0.1, 1.0));
+        for (var i = -18; i < 19; i += 2) {
+            translateMatrix = mat4.create();
+            mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(i, 18.0, 0));
+            mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
+            mat4.multiply(mvpMatrix, mvpMatrix, scaleMatrix);
+            mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
+            this.texture.draw(mvpMatrix);
+        }
+        for (var i = -18; i < 19; i += 2) {
+            translateMatrix = mat4.create();
+            mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(i, -18.0, 0));
+            mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
+            mat4.multiply(mvpMatrix, mvpMatrix, scaleMatrix);
+            mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
+            this.texture.draw(mvpMatrix);
+        }
+        for (var i = -18; i < 19; i += 2) {
+            translateMatrix = mat4.create();
+            mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(18.0, i, 0));
+            mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
+            mat4.multiply(mvpMatrix, mvpMatrix, scaleMatrix);
+            mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
+            this.texture.draw(mvpMatrix);
+        }
+        for (var i = -18; i < 19; i += 2) {
+            translateMatrix = mat4.create();
+            mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(-18.0, i, 0));
+            mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
+            mat4.multiply(mvpMatrix, mvpMatrix, scaleMatrix);
+            mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
+            this.texture.draw(mvpMatrix);
+        }
+    }
 
     this.computeFPS();
 };

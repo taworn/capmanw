@@ -29,7 +29,6 @@ function Game() {
     this.textureShader.init(this.gl);
 
     this.scene = new TitleScene();
-    this.scene.init();
 }
 
 /**
@@ -37,7 +36,8 @@ function Game() {
  * @param sceneId A scene identifier, look at SCENE_*.
  */
 Game.prototype.changeScene = function (sceneId) {
-    this.scene.finish();
+    if (this.scene)
+        this.scene.release();
     switch (sceneId) {
         default:
         case SCENE_DEFAULT:
@@ -50,7 +50,6 @@ Game.prototype.changeScene = function (sceneId) {
             this.scene = new PlayScene();
             break;
     }
-    this.scene.init();
 };
 
 /**

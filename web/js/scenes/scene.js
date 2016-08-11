@@ -1,39 +1,20 @@
-/* global mat4, vec3, NormalShader, textureShader, Game */
+/* global mat4, vec3, Game */
 
 /**
- * A single game scene.
+ * A base game scene.
  */
 function Scene() {
     console.log("Scene created");
-}
-
-/**
- * Initializes a game scene.
- */
-Scene.prototype.init = function () {
-    console.log("init() called");
-
-    // combines matrices
-    var viewMatrix = mat4.create();
-    mat4.lookAt(viewMatrix
-            , vec3.fromValues(0, 0, 1.5)
-            , vec3.fromValues(0, 0, -5)
-            , vec3.fromValues(0, 1, 0));
-    var projectionMatrix = mat4.create();
-    mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, -1.0, 25.0);
-    this.viewAndProjectMatrix = mat4.create();
-    mat4.multiply(this.viewAndProjectMatrix, projectionMatrix, viewMatrix);
 
     this.fps = 0;
     this.frameCount = 0;
     this.timeStart = performance.now();
-};
+}
 
 /**
- * Uninitializes a game scene.
+ * Releases game resources.
  */
-Scene.prototype.finish = function () {
-    console.log("finish() called");
+Scene.prototype.release = function () {
 };
 
 /**
