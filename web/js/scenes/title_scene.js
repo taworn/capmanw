@@ -8,11 +8,12 @@ function TitleScene() {
 
     var gl = Game.instance().getGL();
     this.image = new Image();
-    this.texture = new Texture(gl);
+    this.sprite = new Sprite(gl);
+    this.modelX = 0.0;
 
     var self = this;
     this.image.onload = function () {
-        self.texture.bind(self.image);
+        self.sprite.bind(self.image, 3, 2);
     };
     this.image.src = "./res/a.png";
 
@@ -32,7 +33,7 @@ TitleScene.prototype = new Scene();
 
 TitleScene.prototype.release = function () {
     console.log("TitleScene release() called");
-    this.texture.release();
+    this.sprite.release();
 };
 
 TitleScene.prototype.handleKey = function (e) {
@@ -50,16 +51,19 @@ TitleScene.prototype.render = function () {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    if (this.texture.isLoaded()) {
+    if (this.sprite.isLoaded()) {
         var translateMatrix = mat4.create();
-        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(0, -0.7, 0));
+        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX, -0.7, 0));
+        this.modelX -= 0.05;
+        if (this.modelX < -5.5)
+            this.modelX = 5.5;
         var scaleMatrix = mat4.create();
         mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.35, 0.35, 1));
         var mvpMatrix = mat4.create();
         mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
-        this.texture.draw(mvpMatrix);
+        this.sprite.draw(mvpMatrix, 1);
     }
 
     var context = game.getContext();
