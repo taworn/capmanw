@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, NormalShader, TextureShader, Scene, SCENE_PLAY */
+/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, SCENE_PLAY */
 
 /**
  * Title game scene.

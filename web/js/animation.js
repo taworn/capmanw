@@ -1,4 +1,4 @@
-/* global Sprite */
+/* global mat4, vec3, Game, TextureShader, Sprite */
 
 /**
  * An animation class.

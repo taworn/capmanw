@@ -1,6 +1,10 @@
 /* global Game, Shader */
 
 function TextureShader() {
+    this.position = -1;
+    this.coord = -1;
+    this.sampler = -1;
+    this.mvpMatrix = null;
 }
 
 TextureShader.prototype = new Shader();
@@ -28,8 +32,8 @@ TextureShader.prototype.init = function (gl) {
 
     this.position = gl.getAttribLocation(this.program, "aVertexPosition");
     this.coord = gl.getAttribLocation(this.program, "aTextureCoord");
-    this.mvpMatrix = gl.getUniformLocation(this.program, "uMVPMatrix");
     this.sampler = gl.getUniformLocation(this.program, "uSampler");
+    this.mvpMatrix = gl.getUniformLocation(this.program, "uMVPMatrix");
     return true;
 };
 

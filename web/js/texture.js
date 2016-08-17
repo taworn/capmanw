@@ -1,4 +1,4 @@
-/* global TextureShader, Game */
+/* global mat4, vec3, Game, TextureShader */
 
 /**
  * A texture class.
