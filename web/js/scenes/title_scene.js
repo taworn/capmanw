@@ -9,13 +9,29 @@ function TitleScene() {
     var gl = Game.instance().getGL();
     this.image = new Image();
     this.sprite = new Sprite(gl);
-    this.modelX = 0.0;
+    this.aniHero = new Animation(this.sprite);
+    this.aniDivo = new Animation(this.sprite);
 
     var self = this;
     this.image.onload = function () {
-        self.sprite.bind(self.image, 3, 2);
+        self.sprite.bind(self.image, 8, 8);
     };
-    this.image.src = "./res/a.png";
+    this.image.src = "./res/pacman.png";
+
+    var TIME = 300;
+    this.aniHero.add(0, 0, 2, TIME);
+    this.aniHero.add(1, 2, 4, TIME);
+    this.aniHero.add(2, 4, 6, TIME);
+    this.aniHero.add(3, 6, 8, TIME);
+    this.aniHero.use(0);
+
+    this.aniDivo.add(0, 8, 10, TIME);
+    this.aniDivo.add(1, 10, 12, TIME);
+    this.aniDivo.add(2, 12, 14, TIME);
+    this.aniDivo.add(3, 14, 16, TIME);
+    this.aniDivo.use(0);
+
+    this.modelX = 0.0;
 
     // combines matrices
     var viewMatrix = mat4.create();
@@ -24,7 +40,7 @@ function TitleScene() {
             , vec3.fromValues(0, 0, -5)
             , vec3.fromValues(0, 1, 0));
     var projectionMatrix = mat4.create();
-    mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, -1.0, 25.0);
+    mat4.ortho(projectionMatrix, -1.0, 1.0, -1.0, 1.0, -1.0, 25.0);
     this.viewAndProjectMatrix = mat4.create();
     mat4.multiply(this.viewAndProjectMatrix, projectionMatrix, viewMatrix);
 }
@@ -52,18 +68,29 @@ TitleScene.prototype.render = function () {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     if (this.sprite.isLoaded()) {
-        var translateMatrix = mat4.create();
-        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX, -0.7, 0));
-        this.modelX -= 0.05;
-        if (this.modelX < -5.5)
-            this.modelX = 5.5;
         var scaleMatrix = mat4.create();
-        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.35, 0.35, 1));
+        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.1, 0.1, 1));
+        var translateMatrix = mat4.create();
+        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX, -0.1, 0));
         var mvpMatrix = mat4.create();
         mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
-        mat4.multiply(mvpMatrix, mvpMatrix, scaleMatrix);
-        mat4.multiply(mvpMatrix, mvpMatrix, translateMatrix);
-        this.sprite.draw(mvpMatrix, 1);
+        var tempMatrix = mat4.create();
+        mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
+        mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
+        this.aniHero.draw(mvpMatrix);
+
+        translateMatrix = mat4.create();
+        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX - 0.2, -0.1, 0));
+        mvpMatrix = mat4.create();
+        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
+        tempMatrix = mat4.create();
+        mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
+        mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
+        this.aniDivo.draw(mvpMatrix);
+
+        this.modelX -= 0.01;
+        if (this.modelX < -1.0)
+            this.modelX = 1.0;
     }
 
     var context = game.getContext();
