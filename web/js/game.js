@@ -36,6 +36,7 @@ function Game() {
  * @param sceneId A scene identifier, look at SCENE_*.
  */
 Game.prototype.changeScene = function (sceneId) {
+    console.log("changeScene(), sceneId = " + sceneId);
     if (this.scene)
         this.scene.release();
     switch (sceneId) {
