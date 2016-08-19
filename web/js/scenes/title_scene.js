@@ -9,8 +9,8 @@ function TitleScene() {
     var gl = Game.instance().getGL();
     this.image = new Image();
     this.sprite = new Sprite(gl);
-    this.aniHero = new Animation(this.sprite);
-    this.aniDivo = new Animation(this.sprite);
+    this.aniHero = new Animation();
+    this.aniDivo = new Animation();
 
     var self = this;
     this.image.onload = function () {
@@ -77,7 +77,7 @@ TitleScene.prototype.render = function () {
         var tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniHero.draw(mvpMatrix);
+        this.aniHero.draw(mvpMatrix, this.sprite);
 
         translateMatrix = mat4.create();
         mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX - 0.2, -0.1, 0));
@@ -86,7 +86,7 @@ TitleScene.prototype.render = function () {
         tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivo.draw(mvpMatrix);
+        this.aniDivo.draw(mvpMatrix, this.sprite);
 
         this.modelX -= 0.01;
         if (this.modelX < -1.0)

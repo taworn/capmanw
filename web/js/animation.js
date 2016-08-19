@@ -1,12 +1,11 @@
-/* global mat4, vec3, Game, TextureShader, Sprite */
+/* global mat4, vec3, Game, Sprite */
 
 /**
  * An animation class.
  * @param {type} gl
  * @returns {Animation}
  */
-function Animation(sprite) {
-    this.sprite = sprite;
+function Animation() {
     this.plays = new Array();
     for (var i = 0; i < 16; i++) {
         this.plays[i] = {
@@ -17,6 +16,10 @@ function Animation(sprite) {
     }
     this.currentPlaying = -1;
     this.currentImage = 0;
+    this.currentX = 0;
+    this.currentY = 0;
+    this.velocityX = 0;
+    this.velocityY = 0;
     this.timeStart = performance.now();
 }
 
@@ -43,8 +46,8 @@ Animation.prototype.use = function (number) {
 /**
  * Draws animation.
  */
-Animation.prototype.draw = function (mvpMatrix) {
-    this.sprite.draw(mvpMatrix, this.currentImage);
+Animation.prototype.draw = function (mvpMatrix, sprite) {
+    sprite.draw(mvpMatrix, this.currentImage);
 
     var usage = performance.now() - this.timeStart;
     if (usage > this.plays[this.currentPlaying].time) {
@@ -53,5 +56,27 @@ Animation.prototype.draw = function (mvpMatrix) {
             this.currentImage = this.plays[this.currentPlaying].start;
         this.timeStart = performance.now();
     }
+};
+
+Animation.prototype.moveTo = function (x, y) {
+    this.currentX = x;
+    this.currentY = y;
+};
+
+Animation.prototype.moveBy = function (dx, dy) {
+    this.currentX += dx;
+    this.currentY += dy;
+};
+
+Animation.prototype.setVelocity = function (x, y) {
+    this.velocityX = x;
+    this.velocityY = y;
+};
+
+Animation.prototype.playFrame = function (enableX, enableY) {
+    if (enableX)
+        this.currentX += this.velocityX;
+    if (enableY)
+        this.currentY += this.velocityY;
 };
 

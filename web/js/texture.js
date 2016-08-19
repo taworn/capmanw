@@ -7,7 +7,6 @@
  */
 function Texture(gl) {
     this.gl = gl;
-    this.shader = Game.instance().getTextureShader();
     this.verticesHandle = gl.createBuffer();
     this.indicesHandle = gl.createBuffer();
     this.textureHandle = gl.createTexture();
@@ -78,25 +77,26 @@ Texture.prototype.bind = function (image) {
  */
 Texture.prototype.draw = function (mvpMatrix) {
     var gl = this.gl;
-    this.shader.useProgram(gl);
+    var shader = Game.instance().getTextureShader();
+    shader.useProgram(gl);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesHandle);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesHandle);
 
     // uses texture
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.textureHandle);
-    gl.uniform1i(this.shader.sampler, 0);
+    gl.uniform1i(shader.sampler, 0);
 
     // positions attribute
-    gl.vertexAttribPointer(this.shader.position, 3, gl.FLOAT, gl.FALSE, 20, 0);
-    gl.enableVertexAttribArray(this.shader.position);
+    gl.vertexAttribPointer(shader.position, 3, gl.FLOAT, gl.FALSE, 20, 0);
+    gl.enableVertexAttribArray(shader.position);
 
     // texture coordinates attribute
-    gl.vertexAttribPointer(this.shader.coord, 2, gl.FLOAT, gl.FALSE, 20, 12);
-    gl.enableVertexAttribArray(this.shader.coord);
+    gl.vertexAttribPointer(shader.coord, 2, gl.FLOAT, gl.FALSE, 20, 12);
+    gl.enableVertexAttribArray(shader.coord);
 
     // drawing
-    gl.uniformMatrix4fv(this.shader.mvpMatrix, false, mvpMatrix);
+    gl.uniformMatrix4fv(shader.mvpMatrix, false, mvpMatrix);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 };
 

@@ -9,12 +9,12 @@ function PlayScene() {
     var gl = Game.instance().getGL();
     this.image = new Image();
     this.sprite = new Sprite(gl);
-    this.aniHero = new Animation(this.sprite);
+    this.aniHero = new Animation();
     this.aniDivoes = [
-        new Animation(this.sprite),
-        new Animation(this.sprite),
-        new Animation(this.sprite),
-        new Animation(this.sprite)
+        new Animation(),
+        new Animation(),
+        new Animation(),
+        new Animation()
     ];
 
     var self = this;
@@ -38,11 +38,6 @@ function PlayScene() {
         this.aniDivoes[i].add(3, j + 6, j + 8, TIME);
         this.aniDivoes[i].use(0);
     }
-
-    this.modelX = 0.0;
-    this.modelY = 0.0;
-    this.modelDx = 0.0;
-    this.modelDy = 0.0;
 
     // combines matrices
     var viewMatrix = mat4.create();
@@ -69,27 +64,23 @@ PlayScene.prototype.handleKey = function (e) {
     }
     else if (e.keyCode === 87 || e.keyCode === 38) {
         console.log("key W or UP");
+        this.aniHero.setVelocity(0.0, 0.02);
         this.aniHero.use(2);
-        this.modelDx = 0.0;
-        this.modelDy = 0.02;
     }
     else if (e.keyCode === 83 || e.keyCode === 40) {
         console.log("key S or DOWN");
+        this.aniHero.setVelocity(0.0, -0.02);
         this.aniHero.use(3);
-        this.modelDx = 0.0;
-        this.modelDy = -0.02;
     }
     else if (e.keyCode === 65 || e.keyCode === 37) {
         console.log("key A or LEFT");
+        this.aniHero.setVelocity(-0.02, 0.0);
         this.aniHero.use(0);
-        this.modelDx = -0.02;
-        this.modelDy = 0.0;
     }
     else if (e.keyCode === 68 || e.keyCode === 39) {
         console.log("key D or RIGHT");
+        this.aniHero.setVelocity(0.02, 0.0);
         this.aniHero.use(1);
-        this.modelDx = 0.02;
-        this.modelDy = 0.0;
     }
     else if (e.keyCode === 13) {
         console.log("key ENTER");
@@ -107,21 +98,23 @@ PlayScene.prototype.render = function () {
         var scaleMatrix = mat4.create();
         mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.05, 0.05, 1.0));
         var translateMatrix = mat4.create();
-        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX, this.modelY, 0));
-        if (this.modelDx > 0.0 && this.modelX < 0.95)
-            this.modelX += this.modelDx;
-        else if (this.modelDx < 0.0 && this.modelX > -0.95)
-            this.modelX += this.modelDx;
-        if (this.modelDy > 0.0 && this.modelY < 0.95)
-            this.modelY += this.modelDy;
-        else if (this.modelDy < 0.0 && this.modelY > -0.95)
-            this.modelY += this.modelDy;
+        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.aniHero.currentX, this.aniHero.currentY, 0));
         var mvpMatrix = mat4.create();
         mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
         var tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniHero.draw(mvpMatrix);
+        var enableX = false, enableY = false;
+        if (this.aniHero.velocityX > 0.0 && this.aniHero.currentX < 0.95)
+            enableX = true;
+        else if (this.aniHero.velocityX < 0.0 && this.aniHero.currentX > -0.95)
+            enableX = true;
+        if (this.aniHero.velocityY > 0.0 && this.aniHero.currentY < 0.95)
+            enableY = true;
+        else if (this.aniHero.velocityY < 0.0 && this.aniHero.currentY > -0.95)
+            enableY = true;
+        this.aniHero.playFrame(enableX, enableY);
+        this.aniHero.draw(mvpMatrix, this.sprite);
 
         translateMatrix = mat4.create();
         mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(-0.5, 0.5, 0));
@@ -130,7 +123,7 @@ PlayScene.prototype.render = function () {
         tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivoes[0].draw(mvpMatrix);
+        this.aniDivoes[0].draw(mvpMatrix, this.sprite);
 
         translateMatrix = mat4.create();
         mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(0.5, 0.5, 0));
@@ -139,7 +132,7 @@ PlayScene.prototype.render = function () {
         tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivoes[1].draw(mvpMatrix);
+        this.aniDivoes[1].draw(mvpMatrix, this.sprite);
 
         translateMatrix = mat4.create();
         mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(-0.5, -0.5, 0));
@@ -148,7 +141,7 @@ PlayScene.prototype.render = function () {
         tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivoes[2].draw(mvpMatrix);
+        this.aniDivoes[2].draw(mvpMatrix, this.sprite);
 
         translateMatrix = mat4.create();
         mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(0.5, -0.5, 0));
@@ -157,7 +150,7 @@ PlayScene.prototype.render = function () {
         tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivoes[3].draw(mvpMatrix);
+        this.aniDivoes[3].draw(mvpMatrix, this.sprite);
     }
 
     this.computeFPS();
