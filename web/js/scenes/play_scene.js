@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, SCENE_TITLE */
+/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, SCENE_TITLE, Map, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN, Movable, Divo, Pacman */
 
 /**
  * Playing game scene.
@@ -7,37 +7,31 @@ function PlayScene() {
     console.log("PlayScene created");
 
     var gl = Game.instance().getGL();
-    this.image = new Image();
-    this.sprite = new Sprite(gl);
-    this.aniHero = new Animation();
-    this.aniDivoes = [
-        new Animation(),
-        new Animation(),
-        new Animation(),
-        new Animation()
-    ];
+    this.imageMap = new Image();
+    this.spriteMap = new Sprite(gl);
+    this.imagePacman = new Image();
+    this.spritePacman = new Sprite(gl);
+    this.map = new Map();
+    this.movDivoes = [new Divo(), new Divo(), new Divo(), new Divo()];
+    this.movHero = new Pacman();
+    this.timeStart = performance.now();
 
     var self = this;
-    this.image.onload = function () {
-        self.sprite.bind(self.image, 8, 8);
+    this.imageMap.onload = function () {
+        self.spriteMap.bind(self.imageMap, 2, 2);
     };
-    this.image.src = "./res/pacman.png";
+    this.imagePacman.onload = function () {
+        self.spritePacman.bind(self.imagePacman, 8, 8);
+    };
+    this.imageMap.src = "./res/map.png";
+    this.imagePacman.src = "./res/pacman.png";
 
-    var TIME = 300;
-    this.aniHero.add(0, 0, 2, TIME);
-    this.aniHero.add(1, 2, 4, TIME);
-    this.aniHero.add(2, 4, 6, TIME);
-    this.aniHero.add(3, 6, 8, TIME);
-    this.aniHero.use(0);
-
+    this.map.load();
     for (var i = 0; i < 4; i++) {
-        var j = (i + 1) * 8;
-        this.aniDivoes[i].add(0, j + 0, j + 2, TIME);
-        this.aniDivoes[i].add(1, j + 2, j + 4, TIME);
-        this.aniDivoes[i].add(2, j + 4, j + 6, TIME);
-        this.aniDivoes[i].add(3, j + 6, j + 8, TIME);
-        this.aniDivoes[i].use(0);
+        this.movDivoes[i].setId(i);
+        this.movDivoes[i].setMap(this.map);
     }
+    this.movHero.setMap(this.map);
 
     // combines matrices
     var viewMatrix = mat4.create();
@@ -47,40 +41,37 @@ function PlayScene() {
             , vec3.fromValues(0, 1, 0));
     var projectionMatrix = mat4.create();
     mat4.ortho(projectionMatrix, -1.0, 1.0, -1.0, 1.0, -1.0, 25.0);
-    this.viewAndProjectMatrix = mat4.create();
-    mat4.multiply(this.viewAndProjectMatrix, projectionMatrix, viewMatrix);
+    this.viewProjectMatrix = mat4.create();
+    mat4.multiply(this.viewProjectMatrix, projectionMatrix, viewMatrix);
 }
 
 PlayScene.prototype = new Scene();
 
 PlayScene.prototype.release = function () {
     console.log("PlayScene release() called");
-    this.sprite.release();
+    this.spritePacman.release();
+    this.spriteMap.release();
 };
 
 PlayScene.prototype.handleKey = function (e) {
     if (e.keyCode === 32) {
         console.log("key SPACE");
     }
-    else if (e.keyCode === 87 || e.keyCode === 38) {
-        console.log("key W or UP");
-        this.aniHero.setVelocity(0.0, 0.02);
-        this.aniHero.use(2);
-    }
-    else if (e.keyCode === 83 || e.keyCode === 40) {
-        console.log("key S or DOWN");
-        this.aniHero.setVelocity(0.0, -0.02);
-        this.aniHero.use(3);
-    }
     else if (e.keyCode === 65 || e.keyCode === 37) {
         console.log("key A or LEFT");
-        this.aniHero.setVelocity(-0.02, 0.0);
-        this.aniHero.use(0);
+        this.movHero.move(MOVE_LEFT);
     }
     else if (e.keyCode === 68 || e.keyCode === 39) {
         console.log("key D or RIGHT");
-        this.aniHero.setVelocity(0.02, 0.0);
-        this.aniHero.use(1);
+        this.movHero.move(MOVE_RIGHT);
+    }
+    else if (e.keyCode === 87 || e.keyCode === 38) {
+        console.log("key W or UP");
+        this.movHero.move(MOVE_UP);
+    }
+    else if (e.keyCode === 83 || e.keyCode === 40) {
+        console.log("key S or DOWN");
+        this.movHero.move(MOVE_DOWN);
     }
     else if (e.keyCode === 13) {
         console.log("key ENTER");
@@ -94,63 +85,35 @@ PlayScene.prototype.render = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    if (this.sprite.isLoaded()) {
+    if (this.spritePacman.isLoaded()) {
+        // sets timing
+        var timeUsed = Math.floor(performance.now() - this.timeStart);
+        this.timeStart = performance.now();
+        //console.log("used " + timeUsed + " ms");
+        this.movDivoes[0].play(timeUsed);
+        this.movDivoes[1].play(timeUsed);
+        this.movDivoes[2].play(timeUsed);
+        this.movDivoes[3].play(timeUsed);
+        this.movHero.play(timeUsed);
+
+        // sets scaling
         var scaleMatrix = mat4.create();
-        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.05, 0.05, 1.0));
-        var translateMatrix = mat4.create();
-        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.aniHero.currentX, this.aniHero.currentY, 0));
-        var mvpMatrix = mat4.create();
-        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
-        var tempMatrix = mat4.create();
-        mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
-        mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        var enableX = false, enableY = false;
-        if (this.aniHero.velocityX > 0.0 && this.aniHero.currentX < 0.95)
-            enableX = true;
-        else if (this.aniHero.velocityX < 0.0 && this.aniHero.currentX > -0.95)
-            enableX = true;
-        if (this.aniHero.velocityY > 0.0 && this.aniHero.currentY < 0.95)
-            enableY = true;
-        else if (this.aniHero.velocityY < 0.0 && this.aniHero.currentY > -0.95)
-            enableY = true;
-        this.aniHero.playFrame(enableX, enableY);
-        this.aniHero.draw(mvpMatrix, this.sprite);
+        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.0625, 0.0625, 1.0));
+        var scaleUp = {x: 16.0, y: 16.0};
 
-        translateMatrix = mat4.create();
-        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(-0.5, 0.5, 0));
-        mvpMatrix = mat4.create();
-        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
-        tempMatrix = mat4.create();
-        mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
-        mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivoes[0].draw(mvpMatrix, this.sprite);
+        // drawing
+        this.map.draw(this.spriteMap, this.viewProjectMatrix, scaleMatrix, scaleUp);
+        this.movDivoes[0].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
+        this.movDivoes[1].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
+        this.movDivoes[2].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
+        this.movDivoes[3].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
+        this.movHero.draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
 
-        translateMatrix = mat4.create();
-        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(0.5, 0.5, 0));
-        mvpMatrix = mat4.create();
-        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
-        tempMatrix = mat4.create();
-        mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
-        mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivoes[1].draw(mvpMatrix, this.sprite);
-
-        translateMatrix = mat4.create();
-        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(-0.5, -0.5, 0));
-        mvpMatrix = mat4.create();
-        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
-        tempMatrix = mat4.create();
-        mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
-        mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivoes[2].draw(mvpMatrix, this.sprite);
-
-        translateMatrix = mat4.create();
-        mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(0.5, -0.5, 0));
-        mvpMatrix = mat4.create();
-        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
-        tempMatrix = mat4.create();
-        mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
-        mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
-        this.aniDivoes[3].draw(mvpMatrix, this.sprite);
+        // checks idling
+        for (var i = 0; i < 4; i++) {
+            if (this.movDivoes[i].isIdle())
+                this.movDivoes[i].nextMove();
+        }
     }
 
     this.computeFPS();

@@ -68,9 +68,9 @@ Animation.prototype.moveBy = function (dx, dy) {
     this.currentY += dy;
 };
 
-Animation.prototype.setVelocity = function (x, y) {
-    this.velocityX = x;
-    this.velocityY = y;
+Animation.prototype.setVelocity = function (dx, dy) {
+    this.velocityX = dx;
+    this.velocityY = dy;
 };
 
 Animation.prototype.playFrame = function (enableX, enableY) {

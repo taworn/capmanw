@@ -9,8 +9,8 @@ function TitleScene() {
     var gl = Game.instance().getGL();
     this.image = new Image();
     this.sprite = new Sprite(gl);
-    this.aniHero = new Animation();
     this.aniDivo = new Animation();
+    this.aniHero = new Animation();
 
     var self = this;
     this.image.onload = function () {
@@ -19,17 +19,17 @@ function TitleScene() {
     this.image.src = "./res/pacman.png";
 
     var TIME = 300;
-    this.aniHero.add(0, 0, 2, TIME);
-    this.aniHero.add(1, 2, 4, TIME);
-    this.aniHero.add(2, 4, 6, TIME);
-    this.aniHero.add(3, 6, 8, TIME);
-    this.aniHero.use(0);
-
     this.aniDivo.add(0, 8, 10, TIME);
     this.aniDivo.add(1, 10, 12, TIME);
     this.aniDivo.add(2, 12, 14, TIME);
     this.aniDivo.add(3, 14, 16, TIME);
     this.aniDivo.use(0);
+
+    this.aniHero.add(0, 0, 2, TIME);
+    this.aniHero.add(1, 2, 4, TIME);
+    this.aniHero.add(2, 4, 6, TIME);
+    this.aniHero.add(3, 6, 8, TIME);
+    this.aniHero.use(0);
 
     this.modelX = 0.0;
 
@@ -41,8 +41,8 @@ function TitleScene() {
             , vec3.fromValues(0, 1, 0));
     var projectionMatrix = mat4.create();
     mat4.ortho(projectionMatrix, -1.0, 1.0, -1.0, 1.0, -1.0, 25.0);
-    this.viewAndProjectMatrix = mat4.create();
-    mat4.multiply(this.viewAndProjectMatrix, projectionMatrix, viewMatrix);
+    this.viewProjectMatrix = mat4.create();
+    mat4.multiply(this.viewProjectMatrix, projectionMatrix, viewMatrix);
 }
 
 TitleScene.prototype = new Scene();
@@ -73,7 +73,7 @@ TitleScene.prototype.render = function () {
         var translateMatrix = mat4.create();
         mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX, -0.1, 0));
         var mvpMatrix = mat4.create();
-        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
+        mat4.copy(mvpMatrix, this.viewProjectMatrix);
         var tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
@@ -82,7 +82,7 @@ TitleScene.prototype.render = function () {
         translateMatrix = mat4.create();
         mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(this.modelX - 0.2, -0.1, 0));
         mvpMatrix = mat4.create();
-        mat4.copy(mvpMatrix, this.viewAndProjectMatrix);
+        mat4.copy(mvpMatrix, this.viewProjectMatrix);
         tempMatrix = mat4.create();
         mat4.multiply(tempMatrix, translateMatrix, scaleMatrix);
         mat4.multiply(mvpMatrix, mvpMatrix, tempMatrix);
