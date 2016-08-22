@@ -4,6 +4,16 @@
  * A divo class.
  */
 function Divo() {
+    this.point = {x: 0, y: 0};
+    this.walking = false;
+    this.distance = 0;
+    this.target = 0;
+    this.currentDirection = 0;
+    this.nextDirection = 0;
+    this.timePerDistance = 350;
+    this.timeUsed = 0;
+    this.animation = new Animation();
+    this.map = null;
 }
 
 Divo.prototype = new Movable();
@@ -43,7 +53,7 @@ Divo.prototype.nextMove = function () {
         count++;
     if ((dirs & MOVE_DOWN) === MOVE_DOWN)
         count++;
-    
+
     //console.log("dirs: " + dirs + ", count: " + count);
     if (count <= 0)
         return;

@@ -6,16 +6,18 @@ var TIME_PER_ANI_FRAME = 250;
  * A movable class.
  */
 function Movable() {
-    this.point = {x: 0, y: 0};
-    this.walking = false;
-    this.distance = 0;
-    this.target = 0;
-    this.currentDirection = 0;
-    this.nextDirection = 0;
-    this.timePerDistance = 350;
-    this.timeUsed = 0;
-    this.animation = new Animation();
-    this.map = null;
+    /*
+     this.point = {x: 0, y: 0};
+     this.walking = false;
+     this.distance = 0;
+     this.target = 0;
+     this.currentDirection = 0;
+     this.nextDirection = 0;
+     this.timePerDistance = 350;
+     this.timeUsed = 0;
+     this.animation = new Animation();
+     this.map = null;
+     */
 }
 
 /**

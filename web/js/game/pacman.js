@@ -4,6 +4,17 @@
  * A pacman class.
  */
 function Pacman() {
+    this.point = {x: 0, y: 0};
+    this.walking = false;
+    this.distance = 0;
+    this.target = 0;
+    this.currentDirection = 0;
+    this.nextDirection = 0;
+    this.timePerDistance = 350;
+    this.timeUsed = 0;
+    this.animation = new Animation();
+    this.map = null;
+
     this.timePerDistance = 200;
     this.animation.add(0, 0, 2, TIME_PER_ANI_FRAME);
     this.animation.add(1, 2, 4, TIME_PER_ANI_FRAME);
