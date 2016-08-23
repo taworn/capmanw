@@ -35,7 +35,6 @@ Movable.prototype.move = function (direction) {
                 this.nextDirection = direction;
                 this.timeUsed = 0;
                 this.walking = true;
-                //console.log("distance: " + this.distance + ", target: " + this.target);
             }
         }
         else if (direction === MOVE_RIGHT) {
@@ -47,7 +46,6 @@ Movable.prototype.move = function (direction) {
                 this.nextDirection = direction;
                 this.timeUsed = 0;
                 this.walking = true;
-                //console.log("distance: " + this.distance + ", target: " + this.target);
             }
         }
         else if (direction === MOVE_UP) {
@@ -59,7 +57,6 @@ Movable.prototype.move = function (direction) {
                 this.nextDirection = direction;
                 this.timeUsed = 0;
                 this.walking = true;
-                //console.log("distance: " + this.distance + ", target: " + this.target);
             }
         }
         else if (direction === MOVE_DOWN) {
@@ -71,7 +68,6 @@ Movable.prototype.move = function (direction) {
                 this.nextDirection = direction;
                 this.timeUsed = 0;
                 this.walking = true;
-                //console.log("distance: " + this.distance + ", target: " + this.target);
             }
         }
     }
