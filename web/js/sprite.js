@@ -120,6 +120,87 @@ Sprite.prototype.draw = function (mvpMatrix, imageIndex) {
 };
 
 /**
+ * Draws batch sprites.
+ */
+Sprite.prototype.drawBatch = function (mvpMatrix, horz, vert, imageIndex) {
+    var gl = this.gl;
+    var shader = Game.instance().getTextureShader();
+    shader.useProgram(gl);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesHandle);
+
+    // uses texture
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.textureHandle);
+    gl.uniform1i(shader.sampler, 0);
+
+    var width = horz.length - 1;
+    var height = vert.length - 1;
+    var verticesData = [];
+    for (var j = 0; j < height; j++) {
+        for (var i = 0; i < width; i++) {
+            var index = imageIndex[j * width + i];
+            var uIndex = Math.floor(index % this.sliceHorz);
+            var vIndex = Math.floor(index / this.sliceHorz);
+            var u0 = this.uData[uIndex];
+            var u1 = this.uData[uIndex + 1];
+            var v0 = this.vData[vIndex];
+            var v1 = this.vData[vIndex + 1];
+
+            // 1
+            verticesData.push(horz[i + 1]);
+            verticesData.push(vert[j + 1]);
+            verticesData.push(0.0);
+            verticesData.push(u1);
+            verticesData.push(v1);
+            // 2
+            verticesData.push(horz[i + 1]);
+            verticesData.push(vert[j]);
+            verticesData.push(0.0);
+            verticesData.push(u1);
+            verticesData.push(v0);
+            // 3
+            verticesData.push(horz[i]);
+            verticesData.push(vert[j + 1]);
+            verticesData.push(0.0);
+            verticesData.push(u0);
+            verticesData.push(v1);
+            // 4
+            verticesData.push(horz[i + 1]);
+            verticesData.push(vert[j]);
+            verticesData.push(0.0);
+            verticesData.push(u1);
+            verticesData.push(v0);
+            // 5
+            verticesData.push(horz[i]);
+            verticesData.push(vert[j]);
+            verticesData.push(0.0);
+            verticesData.push(u0);
+            verticesData.push(v0);
+            // 6
+            verticesData.push(horz[i]);
+            verticesData.push(vert[j + 1]);
+            verticesData.push(0.0);
+            verticesData.push(u0);
+            verticesData.push(v1);
+        }
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesHandle);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesData), gl.STATIC_DRAW);
+
+    // positions attribute
+    gl.vertexAttribPointer(shader.position, 3, gl.FLOAT, gl.FALSE, 20, 0);
+    gl.enableVertexAttribArray(shader.position);
+
+    // sprite coordinates attribute
+    gl.vertexAttribPointer(shader.coord, 2, gl.FLOAT, gl.FALSE, 20, 12);
+    gl.enableVertexAttribArray(shader.coord);
+
+    // drawing
+    gl.uniformMatrix4fv(shader.mvpMatrix, false, mvpMatrix);
+    gl.drawArrays(gl.TRIANGLES, 0, width * height * 6);
+};
+
+/**
  * Gets number of images.
  */
 Sprite.prototype.getImageCount = function () {

@@ -96,18 +96,19 @@ PlayScene.prototype.render = function () {
         this.movDivoes[3].play(timeUsed);
         this.movHero.play(timeUsed);
 
-        // sets scaling
+        // drawing map
         var scaleMatrix = mat4.create();
-        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.0625, 0.0625, 1.0));
-        var scaleUp = {x: 16.0, y: 16.0};
+        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(1.0, 1.0, 1.0));
+        this.map.draw(this.spriteMap, this.viewProjectMatrix, scaleMatrix);
 
-        // drawing
-        this.map.draw(this.spriteMap, this.viewProjectMatrix, scaleMatrix, scaleUp);
-        this.movDivoes[0].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
-        this.movDivoes[1].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
-        this.movDivoes[2].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
-        this.movDivoes[3].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
-        this.movHero.draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix, scaleUp);
+        // drawing movables
+        scaleMatrix = mat4.create();
+        mat4.scale(scaleMatrix, scaleMatrix, vec3.fromValues(0.0625, 0.0625, 1.0));
+        this.movDivoes[0].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix);
+        this.movDivoes[1].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix);
+        this.movDivoes[2].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix);
+        this.movDivoes[3].draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix);
+        this.movHero.draw(this.spritePacman, this.viewProjectMatrix, scaleMatrix);
 
         // checks idling
         for (var i = 0; i < 4; i++) {
