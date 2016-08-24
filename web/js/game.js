@@ -7,7 +7,10 @@ window.onload = function () {
 
 var SCENE_DEFAULT = 0;
 var SCENE_TITLE = 1;
-var SCENE_PLAY = 2;
+var SCENE_STAGE = 2;
+var SCENE_PLAY = 3;
+var SCENE_GAMEOVER = 4;
+var SCENE_WIN = 5;
 
 /**
  * A simple game engine class.
@@ -28,7 +31,8 @@ function Game() {
     this.textureShader = new TextureShader();
     this.textureShader.init(this.gl);
 
-    this.scene = new TitleScene();
+    this.scene = null;
+    this.nextSceneId = SCENE_TITLE;
 }
 
 /**
@@ -37,9 +41,17 @@ function Game() {
  */
 Game.prototype.changeScene = function (sceneId) {
     console.log("changeScene(), sceneId = " + sceneId);
+    this.nextSceneId = sceneId;
+};
+
+/**
+ * Performs real scene switching.
+ */
+Game.prototype.switchScene = function () {
+    console.log("switchScene(), sceneId = " + this.nextSceneId);
     if (this.scene)
         this.scene.release();
-    switch (sceneId) {
+    switch (this.nextSceneId) {
         default:
         case SCENE_DEFAULT:
             this.scene = new Scene();
@@ -47,25 +59,42 @@ Game.prototype.changeScene = function (sceneId) {
         case SCENE_TITLE:
             this.scene = new TitleScene();
             break;
+        case SCENE_STAGE:
+            //this.scene = new StageScene();
+            break;
         case SCENE_PLAY:
             this.scene = new PlayScene();
             break;
+        case SCENE_GAMEOVER:
+            this.scene = new GameOverScene();
+            break;
+        case SCENE_STAGE:
+            //this.scene = new WinScene();
+            break;
     }
+    this.nextSceneId = -1;
 };
 
 /**
  * Called when user press keyboard.
  */
 Game.prototype.handleKey = function (e) {
-    this.scene.handleKey(e);
+    if (this.scene)
+        this.scene.handleKey(e);
 };
 
 /**
  * Called every render frame.
  */
 Game.prototype.render = function () {
-    this.context.clearRect(0, 0, this.canvasText.width, this.canvasText.height);
-    this.scene.render();
+    if (this.nextSceneId < 0) {
+        this.context.clearRect(0, 0, this.canvasText.width, this.canvasText.height);
+        if (this.scene)
+            this.scene.render();
+    }
+    else
+        this.switchScene();
+
     var self = this;
     window.requestAnimationFrame(function () {
         self.render();

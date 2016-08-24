@@ -43,6 +43,10 @@ Divo.prototype.setMap = function (map) {
  * After move animation completed, it's call this function.
  */
 Divo.prototype.nextMove = function () {
+    if (this.map.hasItem(this)) {
+
+    }
+
     var dirs = this.map.canPreviewMove(this);
     var count = 0;
     if ((dirs & MOVE_LEFT) === MOVE_LEFT)
@@ -82,16 +86,31 @@ Divo.prototype.nextMove = function () {
 
     else {
         var randoms = [];
-        if ((dirs & MOVE_LEFT) === MOVE_LEFT)
+        var opposite = 0;
+        if (this.nextDirection) {
+            randoms[randoms.length] = this.nextDirection;
+            randoms[randoms.length] = this.nextDirection;
+            if (this.currentDirection === MOVE_LEFT)
+                opposite = MOVE_RIGHT;
+            if (this.currentDirection === MOVE_RIGHT)
+                opposite = MOVE_LEFT;
+            if (this.currentDirection === MOVE_UP)
+                opposite = MOVE_DOWN;
+            if (this.currentDirection === MOVE_DOWN)
+                opposite = MOVE_UP;
+        }
+
+        if ((dirs & MOVE_LEFT) === MOVE_LEFT && opposite !== MOVE_LEFT)
             randoms[randoms.length] = MOVE_LEFT;
-        if ((dirs & MOVE_RIGHT) === MOVE_RIGHT)
+        if ((dirs & MOVE_RIGHT) === MOVE_RIGHT && opposite !== MOVE_RIGHT)
             randoms[randoms.length] = MOVE_RIGHT;
-        if ((dirs & MOVE_UP) === MOVE_UP)
+        if ((dirs & MOVE_UP) === MOVE_UP && opposite !== MOVE_UP)
             randoms[randoms.length] = MOVE_UP;
-        if ((dirs & MOVE_DOWN) === MOVE_DOWN)
+        if ((dirs & MOVE_DOWN) === MOVE_DOWN && opposite !== MOVE_DOWN)
             randoms[randoms.length] = MOVE_DOWN;
         if (this.nextDirection)
             randoms[randoms.length] = this.nextDirection;
+
         var min = Math.ceil(0);
         var max = Math.floor(randoms.length - 1);
         var r = Math.floor(Math.random() * (max - min)) + min;
