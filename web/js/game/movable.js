@@ -1,140 +1,145 @@
-/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Map, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN */
-
-var TIME_PER_ANI_FRAME = 250;
+/* global mat4, vec3, Game, Sprite, Animation, Map */
 
 /**
  * A movable class.
  */
 function Movable() {
-    this.point = {x: 0, y: 0};
-    this.walking = false;
-    this.distance = 0;
-    this.target = 0;
-    this.currentDirection = 0;
-    this.nextDirection = 0;
-    this.timePerDistance = 350;
-    this.timeUsed = 0;
-    this.animation = new Animation();
-    this.map = null;
+    // just keep as comment due to bug inheritance
+    /*
+     this.point = {x: 0, y: 0};
+     this.dead = false;
+     this.animating = false;
+     this.distanceX = 0.0;
+     this.distanceY = 0.0;
+     this.targetX = 0.0;
+     this.targetY = 0.0;
+     this.currentDirection = 0;
+     this.nextDirection = 0;
+     this.timePerMove = 250;
+     this.timePerDead = 750;
+     this.timePerDistance = 0;
+     this.timeUsed = 0;
+     this.animation = new Animation();
+     this.map = null;
+     */
 }
 
+Movable.MOVE_LEFT = 1;
+Movable.MOVE_RIGHT = 2;
+Movable.MOVE_UP = 4;
+Movable.MOVE_DOWN = 8;
+
+Movable.ACTION_LEFT = 0;
+Movable.ACTION_RIGHT = 1;
+Movable.ACTION_UP = 2;
+Movable.ACTION_DOWN = 3;
+Movable.ACTION_DEAD = 4;
+
+Movable.TIME_PER_ANI_FRAME = 250;
+
 /**
- * Moves with direction, use constant Map::MOVE_*.
+ * Moves by direction, use constant Map::MOVE_*.
  */
 Movable.prototype.move = function (direction) {
-    if (!this.walking) {
-        var pf = {x: 0, y: 0};
-        if (direction === MOVE_LEFT) {
-            this.animation.use(0);
+    if (!this.dead) {
+        if (!this.animating) {
+            var pf = {x: 0, y: 0};
+
+            if (direction === Movable.MOVE_LEFT)
+                this.animation.use(Movable.ACTION_LEFT);
+            else if (direction === Movable.MOVE_RIGHT)
+                this.animation.use(Movable.ACTION_RIGHT);
+            else if (direction === Movable.MOVE_UP)
+                this.animation.use(Movable.ACTION_UP);
+            else if (direction === Movable.MOVE_DOWN)
+                this.animation.use(Movable.ACTION_DOWN);
+
             if (this.map.canMove(this, direction, this.point, pf)) {
-                this.distance = this.animation.currentX - pf.x;
-                this.target = pf.x;
+                this.distanceX = pf.x - this.animation.currentX;
+                this.distanceY = pf.y - this.animation.currentY;
+                this.targetX = pf.x;
+                this.targetY = pf.y;
                 this.currentDirection = direction;
                 this.nextDirection = direction;
+                this.timePerDistance = this.timePerMove;
                 this.timeUsed = 0;
-                this.walking = true;
+                this.animating = true;
             }
         }
-        else if (direction === MOVE_RIGHT) {
-            this.animation.use(1);
-            if (this.map.canMove(this, direction, this.point, pf)) {
-                this.distance = pf.x - this.animation.currentX;
-                this.target = pf.x;
-                this.currentDirection = direction;
-                this.nextDirection = direction;
-                this.timeUsed = 0;
-                this.walking = true;
-            }
+        else {
+            // for Pacman, use this for controller
+            this.nextDirection = direction;
         }
-        else if (direction === MOVE_UP) {
-            this.animation.use(2);
-            if (this.map.canMove(this, direction, this.point, pf)) {
-                this.distance = pf.y - this.animation.currentY;
-                this.target = pf.y;
-                this.currentDirection = direction;
-                this.nextDirection = direction;
-                this.timeUsed = 0;
-                this.walking = true;
-            }
-        }
-        else if (direction === MOVE_DOWN) {
-            this.animation.use(3);
-            if (this.map.canMove(this, direction, this.point, pf)) {
-                this.distance = this.animation.currentY - pf.y;
-                this.target = pf.y;
-                this.currentDirection = direction;
-                this.nextDirection = direction;
-                this.timeUsed = 0;
-                this.walking = true;
-            }
-        }
-    }
-    else {
-        this.nextDirection = direction;
     }
 };
 
 /**
- * After move animation completed, it's call this function.
+ * Moves to (x, y) directly.
  */
-Movable.prototype.nextMove = function () {
-    this.move(this.nextDirection);
+Movable.prototype.moveDirect = function (p, pf) {
+    this.distanceX = pf.x - this.animation.currentX;
+    this.distanceY = pf.y - this.animation.currentY;
+    this.targetX = pf.x;
+    this.targetY = pf.y;
+    this.timePerDistance = this.timePerDead;
+    this.timeUsed = 0;
+    this.animating = true;
 };
 
 /**
- * Moves with direction, use constant Map::MOVE_*.
+ * Chooses next action.  This function is called after play() is completed.
+ */
+Movable.prototype.nextAction = function () {
+    if (!this.dead) {
+        this.move(this.decision(this.nextDirection));
+    }
+};
+
+/**
+ * Plays animation after call move() or moveDirectly().
  */
 Movable.prototype.play = function (timeUsed) {
-    if (this.walking) {
-        if (this.currentDirection === MOVE_LEFT) {
-            if (this.timeUsed + timeUsed < this.timePerDistance) {
-                var d = timeUsed * this.distance / this.timePerDistance;
-                this.animation.moveBy(-d, 0);
-                this.timeUsed += timeUsed;
-            }
-            else {
-                this.animation.moveTo(this.target, this.animation.currentY);
-                this.walking = false;
-                this.nextMove();
-            }
+    if (this.animating) {
+        if (this.timeUsed + timeUsed < this.timePerDistance) {
+            var dx = timeUsed * this.distanceX / this.timePerDistance;
+            var dy = timeUsed * this.distanceY / this.timePerDistance;
+            this.animation.moveBy(dx, dy);
+            this.timeUsed += timeUsed;
         }
-        else if (this.currentDirection === MOVE_RIGHT) {
-            if (this.timeUsed + timeUsed < this.timePerDistance) {
-                var d = timeUsed * this.distance / this.timePerDistance;
-                this.animation.moveBy(d, 0);
-                this.timeUsed += timeUsed;
-            }
-            else {
-                this.animation.moveTo(this.target, this.animation.currentY);
-                this.walking = false;
-                this.nextMove();
-            }
-        }
-        else if (this.currentDirection === MOVE_UP) {
-            if (this.timeUsed + timeUsed < this.timePerDistance) {
-                var d = timeUsed * this.distance / this.timePerDistance;
-                this.animation.moveBy(0, d);
-                this.timeUsed += timeUsed;
-            }
-            else {
-                this.animation.moveTo(this.animation.currentX, this.target);
-                this.walking = false;
-                this.nextMove();
-            }
-        }
-        else if (this.currentDirection === MOVE_DOWN) {
-            if (this.timeUsed + timeUsed < this.timePerDistance) {
-                var d = timeUsed * this.distance / this.timePerDistance;
-                this.animation.moveBy(0, -d);
-                this.timeUsed += timeUsed;
-            }
-            else {
-                this.animation.moveTo(this.animation.currentX, this.target);
-                this.walking = false;
-                this.nextMove();
-            }
+        else {
+            this.animation.moveTo(this.targetX, this.targetY);
+            this.animating = false;
+            this.nextAction();
         }
     }
+};
+
+/**
+ * Kills this movable.  Inherit class should derived this function.
+ */
+Movable.prototype.kill = function () {
+    this.dead = true;
+};
+
+/**
+ * Checks whether movable is dead.
+ */
+Movable.prototype.isDead = function () {
+    return this.dead;
+};
+
+/**
+ * Checks whether movable is busing or idling.
+ */
+Movable.prototype.isIdle = function () {
+    return !this.animating;
+};
+
+/**
+ * Sets map.  Used to bind Movable with Map.
+ */
+Movable.prototype.setMap = function (map) {
+    this.map = map;
 };
 
 /**
@@ -148,5 +153,12 @@ Movable.prototype.draw = function (sprite, viewProjectMatrix, scaleMatrix) {
     mat4.multiply(modelMatrix, translateMatrix, scaleMatrix);
     mat4.multiply(mvpMatrix, viewProjectMatrix, modelMatrix);
     this.animation.draw(mvpMatrix, sprite);
+};
+
+/**
+ * Chooses which action after animation is completed.
+ */
+Movable.prototype.decision = function (moveDirection) {
+    return moveDirection;
 };
 

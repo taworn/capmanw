@@ -1,9 +1,4 @@
-/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, SCENE_GAMEOVER */
-
-var MOVE_LEFT = 1;
-var MOVE_RIGHT = 2;
-var MOVE_UP = 4;
-var MOVE_DOWN = 8;
+/* global mat4, vec3, Game, Sprite, Animation, Movable */
 
 /**
  * A map class.
@@ -14,10 +9,10 @@ function Map() {
     this.mapData = null;
     this.imageData = null;
     this.itemCount = 0;
-    this.horzBounds = new Array();
-    this.horzPoints = new Array();
-    this.vertBounds = new Array();
-    this.vertPoints = new Array();
+    this.horzBounds = [];
+    this.horzPoints = [];
+    this.vertBounds = [];
+    this.vertPoints = [];
     this.startDivo = {x: 0, y: 0};
     this.startPacman = {x: 0, y: 0};
 }
@@ -90,10 +85,10 @@ Map.prototype.load = function () {
     for (var i = 0; i < length; i++)
         this.vertPoints.push((this.vertBounds[i] + this.vertBounds[i + 1]) / 2.0);
 
-    this.startDivo.x = 8;
-    this.startDivo.y = 1;
-    this.startPacman.x = 8;
-    this.startPacman.y = 10;
+    this.startDivo.x = 4;
+    this.startDivo.y = 4;
+    this.startPacman.x = 9;
+    this.startPacman.y = 1;
     return true;
 };
 
@@ -121,7 +116,7 @@ Map.prototype.getPacmanStartPosition = function (p, pf) {
  * Checks if direction is can be pass.
  */
 Map.prototype.canMove = function (movable, direction, p, pf) {
-    if (direction === MOVE_LEFT) {
+    if (direction === Movable.MOVE_LEFT) {
         var current = movable.point.x;
         var next = current - 1;
         if (next >= 0) {
@@ -136,7 +131,7 @@ Map.prototype.canMove = function (movable, direction, p, pf) {
             }
         }
     }
-    else if (direction === MOVE_RIGHT) {
+    else if (direction === Movable.MOVE_RIGHT) {
         var current = movable.point.x;
         var next = current + 1;
         if (next < this.width) {
@@ -151,7 +146,7 @@ Map.prototype.canMove = function (movable, direction, p, pf) {
             }
         }
     }
-    else if (direction === MOVE_UP) {
+    else if (direction === Movable.MOVE_UP) {
         var current = movable.point.y;
         var next = current - 1;
         if (next >= 0) {
@@ -166,7 +161,7 @@ Map.prototype.canMove = function (movable, direction, p, pf) {
             }
         }
     }
-    else if (direction === MOVE_DOWN) {
+    else if (direction === Movable.MOVE_DOWN) {
         var current = movable.point.y;
         var next = current + 1;
         if (next < this.height) {
@@ -199,19 +194,19 @@ Map.prototype.canPreviewMove = function (movable) {
     // left
     data = this.mapData[y * this.width + x - 1];
     if (x > 0 && (data & 0x01) === 0)
-        result |= MOVE_LEFT;
+        result |= Movable.MOVE_LEFT;
     // right
     data = this.mapData[y * this.width + x + 1];
     if (x < this.width - 1 && (data & 0x01) === 0)
-        result |= MOVE_RIGHT;
+        result |= Movable.MOVE_RIGHT;
     // up
     data = this.mapData[(y - 1) * this.width + x];
     if (y > 0 && (data & 0x01) === 0)
-        result |= MOVE_UP;
+        result |= Movable.MOVE_UP;
     // down
     data = this.mapData[(y + 1) * this.width + x];
     if (y < this.height - 1 && (data & 0x01) === 0)
-        result |= MOVE_DOWN;
+        result |= Movable.MOVE_DOWN;
 
     return result;
 };

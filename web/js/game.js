@@ -33,6 +33,8 @@ function Game() {
 
     this.scene = null;
     this.nextSceneId = SCENE_TITLE;
+
+    new GameData();
 }
 
 /**

@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, SCENE_TITLE, Map, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN, Movable, Divo, Pacman */
+/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, SCENE_TITLE, Map, Movable, Divo, Pacman, GameData */
 
 /**
  * Playing game scene.
@@ -26,23 +26,14 @@ function PlayScene() {
     this.imageMap.src = "./res/map.png";
     this.imagePacman.src = "./res/pacman.png";
 
+    GameData.instance().clear();
     this.map.load();
     for (var i = 0; i < 4; i++) {
         this.movDivoes[i].setId(i);
         this.movDivoes[i].setMap(this.map);
+        GameData.instance().addDivo(this.movDivoes[i]);
     }
     this.movHero.setMap(this.map);
-
-    // combines matrices
-    var viewMatrix = mat4.create();
-    mat4.lookAt(viewMatrix
-            , vec3.fromValues(0, 0, 1.5)
-            , vec3.fromValues(0, 0, -5)
-            , vec3.fromValues(0, 1, 0));
-    var projectionMatrix = mat4.create();
-    mat4.ortho(projectionMatrix, -1.0, 1.0, -1.0, 1.0, -1.0, 25.0);
-    this.viewProjectMatrix = mat4.create();
-    mat4.multiply(this.viewProjectMatrix, projectionMatrix, viewMatrix);
 }
 
 PlayScene.prototype = new Scene();
@@ -59,19 +50,19 @@ PlayScene.prototype.handleKey = function (e) {
     }
     else if (e.keyCode === 65 || e.keyCode === 37) {
         console.log("key A or LEFT");
-        this.movHero.move(MOVE_LEFT);
+        this.movHero.move(Movable.MOVE_LEFT);
     }
     else if (e.keyCode === 68 || e.keyCode === 39) {
         console.log("key D or RIGHT");
-        this.movHero.move(MOVE_RIGHT);
+        this.movHero.move(Movable.MOVE_RIGHT);
     }
     else if (e.keyCode === 87 || e.keyCode === 38) {
         console.log("key W or UP");
-        this.movHero.move(MOVE_UP);
+        this.movHero.move(Movable.MOVE_UP);
     }
     else if (e.keyCode === 83 || e.keyCode === 40) {
         console.log("key S or DOWN");
-        this.movHero.move(MOVE_DOWN);
+        this.movHero.move(Movable.MOVE_DOWN);
     }
     else if (e.keyCode === 13) {
         console.log("key ENTER");
@@ -95,6 +86,20 @@ PlayScene.prototype.render = function () {
         this.movDivoes[2].play(timeUsed);
         this.movDivoes[3].play(timeUsed);
         this.movHero.play(timeUsed);
+        this.movHero.detect();
+
+        // combines matrices
+        var viewMatrix = mat4.create();
+        mat4.lookAt(viewMatrix
+                //, vec3.fromValues(this.movHero.animation.currentX, this.movHero.animation.currentY, 1.5)
+                //, vec3.fromValues(this.movHero.animation.currentX, this.movHero.animation.currentY, -5)
+                , vec3.fromValues(0, 0, 1.5)
+                , vec3.fromValues(0, 0, -5)
+                , vec3.fromValues(0, 1, 0));
+        var projectionMatrix = mat4.create();
+        mat4.ortho(projectionMatrix, -1.0, 1.0, -1.0, 1.0, -1.0, 25.0);
+        this.viewProjectMatrix = mat4.create();
+        mat4.multiply(this.viewProjectMatrix, projectionMatrix, viewMatrix);
 
         // drawing map
         var scaleMatrix = mat4.create();
@@ -113,7 +118,7 @@ PlayScene.prototype.render = function () {
         // checks idling
         for (var i = 0; i < 4; i++) {
             if (this.movDivoes[i].isIdle())
-                this.movDivoes[i].nextMove();
+                this.movDivoes[i].nextAction();
         }
     }
 
