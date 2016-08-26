@@ -14,7 +14,7 @@ function PlayScene() {
     this.map = new Map();
     this.movDivoes = [new Divo(), new Divo(), new Divo(), new Divo()];
     this.movHero = new Pacman();
-    this.timeStart = performance.now();
+    this.timeBegin = performance.now();
 
     var self = this;
     this.imageMap.onload = function () {
@@ -78,8 +78,8 @@ PlayScene.prototype.render = function () {
 
     if (this.spritePacman.isLoaded()) {
         // sets timing
-        var timeUsed = Math.floor(performance.now() - this.timeStart);
-        this.timeStart = performance.now();
+        var timeUsed = Math.floor(performance.now() - this.timeBegin);
+        this.timeBegin = performance.now();
         //console.log("used " + timeUsed + " ms");
         this.movDivoes[0].play(timeUsed);
         this.movDivoes[1].play(timeUsed);
