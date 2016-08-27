@@ -23,7 +23,7 @@ function PlayScene() {
     this.imagePacman.onload = function () {
         self.spritePacman.bind(self.imagePacman, 8, 8);
     };
-    this.imageMap.src = "./res/map.png";
+    this.imageMap.src = "./res/map0.png";
     this.imagePacman.src = "./res/pacman.png";
 
     GameData.instance().clear();
