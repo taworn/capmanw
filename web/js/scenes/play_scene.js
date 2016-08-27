@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, SCENE_TITLE, Map, Movable, Divo, Pacman, GameData */
+/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, Map, Movable, Divo, Pacman, GameData */
 
 /**
  * Playing game scene.
@@ -63,10 +63,6 @@ PlayScene.prototype.handleKey = function (e) {
     else if (e.keyCode === 83 || e.keyCode === 40) {
         console.log("key S or DOWN");
         this.movHero.move(Movable.MOVE_DOWN);
-    }
-    else if (e.keyCode === 13) {
-        console.log("key ENTER");
-        Game.instance().changeScene(SCENE_TITLE);
     }
 };
 

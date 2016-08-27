@@ -21,10 +21,10 @@ function Pacman() {
     this.map = null;
 
     this.timePerDistance = 200;
-    this.animation.add(Movable.ACTION_LEFT, 0, 2, Movable.TIME_PER_ANI_FRAME);
-    this.animation.add(Movable.ACTION_RIGHT, 2, 4, Movable.TIME_PER_ANI_FRAME);
-    this.animation.add(Movable.ACTION_UP, 4, 6, Movable.TIME_PER_ANI_FRAME);
-    this.animation.add(Movable.ACTION_DOWN, 6, 8, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_LEFT, 0, 2, Animation.ON_END_CONTINUE, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_RIGHT, 2, 4, Animation.ON_END_CONTINUE, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_UP, 4, 6, Animation.ON_END_CONTINUE, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_DOWN, 6, 8, Animation.ON_END_CONTINUE, Movable.TIME_PER_ANI_FRAME);
     this.animation.use(Movable.ACTION_LEFT);
 }
 
@@ -67,6 +67,7 @@ Pacman.prototype.detect = function () {
 };
 
 Pacman.prototype.setMap = function (map) {
+    Movable.prototype.setMap(map);
     this.map = map;
     var pf = {x: 0, y: 0};
     this.map.getPacmanStartPosition(this.point, pf);

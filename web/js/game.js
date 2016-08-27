@@ -5,13 +5,6 @@ window.onload = function () {
     game.go();
 };
 
-var SCENE_DEFAULT = 0;
-var SCENE_TITLE = 1;
-var SCENE_STAGE = 2;
-var SCENE_PLAY = 3;
-var SCENE_GAMEOVER = 4;
-var SCENE_WIN = 5;
-
 /**
  * A simple game engine class.
  */
@@ -32,10 +25,17 @@ function Game() {
     this.textureShader.init(this.gl);
 
     this.scene = null;
-    this.nextSceneId = SCENE_TITLE;
+    this.nextSceneId = Game.SCENE_TITLE;
 
     new GameData();
 }
+
+Game.SCENE_DEFAULT = 0;
+Game.SCENE_TITLE = 1;
+Game.SCENE_STAGE = 2;
+Game.SCENE_PLAY = 3;
+Game.SCENE_GAMEOVER = 4;
+Game.SCENE_WIN = 5;
 
 /**
  * Changes the new scene.
@@ -55,23 +55,23 @@ Game.prototype.switchScene = function () {
         this.scene.release();
     switch (this.nextSceneId) {
         default:
-        case SCENE_DEFAULT:
+        case Game.SCENE_DEFAULT:
             this.scene = new Scene();
             break;
-        case SCENE_TITLE:
+        case Game.SCENE_TITLE:
             this.scene = new TitleScene();
             break;
-        case SCENE_STAGE:
+        case Game.SCENE_STAGE:
             //this.scene = new StageScene();
             break;
-        case SCENE_PLAY:
+        case Game.SCENE_PLAY:
             this.scene = new PlayScene();
             break;
-        case SCENE_GAMEOVER:
+        case Game.SCENE_GAMEOVER:
             this.scene = new GameOverScene();
             break;
-        case SCENE_STAGE:
-            //this.scene = new WinScene();
+        case Game.SCENE_WIN:
+            this.scene = new WinScene();
             break;
     }
     this.nextSceneId = -1;

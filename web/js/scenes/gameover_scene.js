@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, SCENE_TITLE */
+/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, Map, Movable, Divo, Pacman, GameData */
 
 /**
  * Game over scene.
@@ -16,7 +16,7 @@ GameOverScene.prototype.release = function () {
 GameOverScene.prototype.handleKey = function (e) {
     if (e.keyCode === 13) {
         console.log("key ENTER");
-        Game.instance().changeScene(SCENE_TITLE);
+        Game.instance().changeScene(Game.SCENE_TITLE);
     }
 };
 

@@ -33,7 +33,10 @@ Movable.ACTION_LEFT = 0;
 Movable.ACTION_RIGHT = 1;
 Movable.ACTION_UP = 2;
 Movable.ACTION_DOWN = 3;
-Movable.ACTION_DEAD = 4;
+Movable.ACTION_DEAD_LEFT = 4;
+Movable.ACTION_DEAD_RIGHT = 5;
+Movable.ACTION_DEAD_UP = 6;
+Movable.ACTION_DEAD_DOWN = 7;
 
 Movable.TIME_PER_ANI_FRAME = 250;
 
@@ -132,7 +135,7 @@ Movable.prototype.isDead = function () {
  * Checks whether movable is busing or idling.
  */
 Movable.prototype.isIdle = function () {
-    return !this.animating;
+    return !this.dead && !this.animating;
 };
 
 /**

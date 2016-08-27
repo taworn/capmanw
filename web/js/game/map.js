@@ -214,7 +214,7 @@ Map.prototype.canPreviewMove = function (movable) {
 /**
  * Checks whether that the floor has item.
  */
-Map.prototype.hasItem = function (movable) {
+Map.prototype.checkAndGetItem = function (movable, item) {
     var index = movable.point.y * this.width + movable.point.x;
     if (this.mapData[index] & 0x10) {
         this.imageData[index] = 0;
@@ -222,7 +222,7 @@ Map.prototype.hasItem = function (movable) {
         this.itemCount--;
         if (this.itemCount <= 0) {
             console.log("Game Over because Divoes eat all items");
-            Game.instance().changeScene(SCENE_GAMEOVER);
+            Game.instance().changeScene(Game.SCENE_GAMEOVER);
         }
         return true;
     }
@@ -239,6 +239,6 @@ Map.prototype.draw = function (sprite, viewProjectMatrix, scaleMatrix) {
     mat4.translate(translateMatrix, translateMatrix, vec3.fromValues(0, 0, 0));
     mat4.multiply(modelMatrix, translateMatrix, scaleMatrix);
     mat4.multiply(mvpMatrix, viewProjectMatrix, modelMatrix);
-    sprite.drawBatch(mvpMatrix, this.horzBounds, this.vertBounds, this.imageData);
+    sprite.drawBatch(mvpMatrix, this.horzBounds, this.vertBounds, 0.0, this.imageData);
 };
 

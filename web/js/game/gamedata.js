@@ -5,6 +5,8 @@
  */
 function GameData() {
     GameData.singleton = this;
+    this.score = 0;
+    this.divoLife = 0;
     this.divoList = [];
 }
 
@@ -12,7 +14,22 @@ function GameData() {
  * Clears data.
  */
 GameData.prototype.clear = function () {
+    this.divoLife = 5;
     this.divoList = [];
+};
+
+/**
+ * Decrease divo life by one.
+ */
+GameData.prototype.divoLifeDecrease = function () {
+    this.divoLife--;
+};
+
+/**
+ * Checks divo can respawn.
+ */
+GameData.prototype.divoCanRelife = function () {
+    return this.divoLife > 0;
 };
 
 /**
@@ -34,6 +51,32 @@ GameData.prototype.getDivo = function (id) {
  */
 GameData.prototype.getDivoCount = function () {
     return this.divoList.length;
+};
+
+/**
+ * Checks that all divoes dead.
+ */
+GameData.prototype.checkAllDivoDead = function () {
+    var i = 0;
+    while (i < this.divoList.length) {
+        if (!this.divoList[i].isDead())
+            return false;
+        else
+            i++;
+    }
+    return true;
+};
+
+/**
+ * Retrieves bonus after get item.
+ */
+GameData.prototype.getBonus = function (item) {
+    if (item === 0x01) {
+        this.score += 10;
+    }
+    else if (item === 0x02) {
+        this.score += 100;
+    }
 };
 
 GameData.instance = function () {

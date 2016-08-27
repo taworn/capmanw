@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, SCENE_PLAY */
+/* global mat4, vec3, Game, NormalShader, TextureShader, Texture, Sprite, Animation, Scene, Map, Movable, Divo, Pacman, GameData */
 
 /**
  * Title game scene.
@@ -19,16 +19,16 @@ function TitleScene() {
     this.image.src = "./res/pacman.png";
 
     var TIME = 300;
-    this.aniDivo.add(0, 8, 10, TIME);
-    this.aniDivo.add(1, 10, 12, TIME);
-    this.aniDivo.add(2, 12, 14, TIME);
-    this.aniDivo.add(3, 14, 16, TIME);
+    this.aniDivo.add(0, 8, 10, Animation.ON_END_CONTINUE, TIME);
+    this.aniDivo.add(1, 10, 12, Animation.ON_END_CONTINUE, TIME);
+    this.aniDivo.add(2, 12, 14, Animation.ON_END_CONTINUE, TIME);
+    this.aniDivo.add(3, 14, 16, Animation.ON_END_CONTINUE, TIME);
     this.aniDivo.use(0);
 
-    this.aniHero.add(0, 0, 2, TIME);
-    this.aniHero.add(1, 2, 4, TIME);
-    this.aniHero.add(2, 4, 6, TIME);
-    this.aniHero.add(3, 6, 8, TIME);
+    this.aniHero.add(0, 0, 2, Animation.ON_END_CONTINUE, TIME);
+    this.aniHero.add(1, 2, 4, Animation.ON_END_CONTINUE, TIME);
+    this.aniHero.add(2, 4, 6, Animation.ON_END_CONTINUE, TIME);
+    this.aniHero.add(3, 6, 8, Animation.ON_END_CONTINUE, TIME);
     this.aniHero.use(0);
 
     this.modelX = 0.0;
@@ -55,7 +55,7 @@ TitleScene.prototype.release = function () {
 TitleScene.prototype.handleKey = function (e) {
     if (e.keyCode === 13) {
         console.log("key ENTER");
-        Game.instance().changeScene(SCENE_PLAY);
+        Game.instance().changeScene(Game.SCENE_PLAY);
     }
 };
 

@@ -122,7 +122,7 @@ Sprite.prototype.draw = function (mvpMatrix, imageIndex) {
 /**
  * Draws batch sprites.
  */
-Sprite.prototype.drawBatch = function (mvpMatrix, horz, vert, imageIndex) {
+Sprite.prototype.drawBatch = function (mvpMatrix, horz, vert, z, imageIndex) {
     var gl = this.gl;
     var shader = Game.instance().getTextureShader();
     shader.useProgram(gl);
@@ -149,37 +149,37 @@ Sprite.prototype.drawBatch = function (mvpMatrix, horz, vert, imageIndex) {
             // 1
             verticesData.push(horz[i + 1]);
             verticesData.push(vert[j + 1]);
-            verticesData.push(0.0);
+            verticesData.push(z);
             verticesData.push(u1);
             verticesData.push(v1);
             // 2
             verticesData.push(horz[i + 1]);
             verticesData.push(vert[j]);
-            verticesData.push(0.0);
+            verticesData.push(z);
             verticesData.push(u1);
             verticesData.push(v0);
             // 3
             verticesData.push(horz[i]);
             verticesData.push(vert[j + 1]);
-            verticesData.push(0.0);
+            verticesData.push(z);
             verticesData.push(u0);
             verticesData.push(v1);
             // 4
             verticesData.push(horz[i + 1]);
             verticesData.push(vert[j]);
-            verticesData.push(0.0);
+            verticesData.push(z);
             verticesData.push(u1);
             verticesData.push(v0);
             // 5
             verticesData.push(horz[i]);
             verticesData.push(vert[j]);
-            verticesData.push(0.0);
+            verticesData.push(z);
             verticesData.push(u0);
             verticesData.push(v0);
             // 6
             verticesData.push(horz[i]);
             verticesData.push(vert[j + 1]);
-            verticesData.push(0.0);
+            verticesData.push(z);
             verticesData.push(u0);
             verticesData.push(v1);
         }

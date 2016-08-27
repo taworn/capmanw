@@ -19,6 +19,7 @@ function Divo() {
     this.timeUsed = 0;
     this.animation = new Animation();
     this.map = null;
+    this.divoId = -1;
 }
 
 Divo.prototype = new Movable();
@@ -27,32 +28,83 @@ Divo.prototype = new Movable();
  * Sets divo identifer, just used to distint animation's set.
  */
 Divo.prototype.setId = function (divoId) {
-    this.animation.add(Movable.ACTION_LEFT, (divoId + 1) * 8, (divoId + 1) * 8 + 2, Movable.TIME_PER_ANI_FRAME);
-    this.animation.add(Movable.ACTION_RIGHT, (divoId + 1) * 8 + 2, (divoId + 1) * 8 + 4, Movable.TIME_PER_ANI_FRAME);
-    this.animation.add(Movable.ACTION_UP, (divoId + 1) * 8 + 4, (divoId + 1) * 8 + 6, Movable.TIME_PER_ANI_FRAME);
-    this.animation.add(Movable.ACTION_DOWN, (divoId + 1) * 8 + 6, (divoId + 1) * 8 + 8, Movable.TIME_PER_ANI_FRAME);
-    this.animation.add(Movable.ACTION_DEAD, 56, 60, Movable.TIME_PER_ANI_FRAME);
+    this.divoId = divoId;
+    this.animation.add(Movable.ACTION_LEFT, (divoId + 1) * 8 + 0, (divoId + 1) * 8 + 2, Animation.ON_END_CONTINUE, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_RIGHT, (divoId + 1) * 8 + 2, (divoId + 1) * 8 + 4, Animation.ON_END_CONTINUE, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_UP, (divoId + 1) * 8 + 4, (divoId + 1) * 8 + 6, Animation.ON_END_CONTINUE, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_DOWN, (divoId + 1) * 8 + 6, (divoId + 1) * 8 + 8, Animation.ON_END_CONTINUE, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_DEAD_LEFT, 56, 57, Animation.ON_END_KEEP_LAST_FRAME, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_DEAD_RIGHT, 57, 58, Animation.ON_END_KEEP_LAST_FRAME, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_DEAD_UP, 58, 59, Animation.ON_END_KEEP_LAST_FRAME, Movable.TIME_PER_ANI_FRAME);
+    this.animation.add(Movable.ACTION_DEAD_DOWN, 59, 60, Animation.ON_END_KEEP_LAST_FRAME, Movable.TIME_PER_ANI_FRAME);
     this.animation.use(Movable.ACTION_LEFT);
+};
+
+Divo.prototype.nextAction = function () {
+    // ancestor function not work!
+    // just copy code here for now
+    if (!this.dead) {
+        this.move(this.decision(this.nextDirection));
+    }
+
+    if (this.dead) {
+        if (GameData.instance().divoCanRelife()) {
+            console.log("Divo #" + this.divoId + " is relife");
+            GameData.instance().divoLifeDecrease();
+            this.dead = false;
+
+            var pf = {x: 0, y: 0};
+            this.map.getDivoStartPosition(this.point, pf);
+            this.animation.moveTo(pf.x, pf.y);
+            this.animation.use(Movable.ACTION_LEFT);
+        }
+        else {
+            if (GameData.instance().checkAllDivoDead()) {
+                console.log("all Divoes are dead");
+                Game.instance().changeScene(Game.SCENE_WIN);
+            }
+        }
+    }
 };
 
 Divo.prototype.kill = function () {
     this.dead = true;
-    this.animation.use(Movable.ACTION_DEAD);
+
     var p = {x: 0, y: 0};
     var pf = {x: 0, y: 0};
     this.map.getDivoStartPosition(p, pf);
     this.moveDirect(p, pf);
+
+    var dX = pf.x - this.animation.currentX;
+    var dY = pf.y - this.animation.currentY;
+    if (Math.abs(dX) >= Math.abs(dY)) {
+        if (dX <= 0.0)
+            this.animation.use(Movable.ACTION_DEAD_LEFT);
+        else
+            this.animation.use(Movable.ACTION_DEAD_RIGHT);
+    }
+    else {
+        if (dY <= 0.0)
+            this.animation.use(Movable.ACTION_DEAD_DOWN);
+        else
+            this.animation.use(Movable.ACTION_DEAD_UP);
+    }
 };
 
 Divo.prototype.setMap = function (map) {
+    Movable.prototype.setMap(map);
     this.map = map;
+
+    GameData.instance().divoLifeDecrease();
     var pf = {x: 0, y: 0};
     this.map.getDivoStartPosition(this.point, pf);
     this.animation.moveTo(pf.x, pf.y);
 };
 
 Divo.prototype.decision = function (moveDirection) {
-    if (this.map.hasItem(this)) {
+    var item = 0;
+    if (this.map.checkAndGetItem(this, item)) {
+        GameData.instance().getBonus(item);
     }
 
     // checks directions can move
