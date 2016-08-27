@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, Sprite, Animation, Movable */
+/* global mat4, vec3, Game, Sprite, Animation, Movable, GameData */
 
 /**
  * A map class.
@@ -217,6 +217,7 @@ Map.prototype.canPreviewMove = function (movable) {
 Map.prototype.checkAndGetItem = function (movable, item) {
     var index = movable.point.y * this.width + movable.point.x;
     if (this.mapData[index] & 0x10) {
+        item.value = this.imageData[index];
         this.imageData[index] = 0;
         this.mapData[index] &= ~0x10;
         this.itemCount--;

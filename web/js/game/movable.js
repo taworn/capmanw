@@ -1,4 +1,4 @@
-/* global mat4, vec3, Game, Sprite, Animation, Map */
+/* global mat4, vec3, Game, Sprite, Animation, Map, GameData */
 
 /**
  * A movable class.
@@ -33,10 +33,14 @@ Movable.ACTION_LEFT = 0;
 Movable.ACTION_RIGHT = 1;
 Movable.ACTION_UP = 2;
 Movable.ACTION_DOWN = 3;
-Movable.ACTION_DEAD_LEFT = 4;
-Movable.ACTION_DEAD_RIGHT = 5;
-Movable.ACTION_DEAD_UP = 6;
-Movable.ACTION_DEAD_DOWN = 7;
+Movable.ACTION_REVERSE_LEFT = 4;
+Movable.ACTION_REVERSE_RIGHT = 5;
+Movable.ACTION_REVERSE_UP = 6;
+Movable.ACTION_REVERSE_DOWN = 7;
+Movable.ACTION_DEAD_LEFT = 8;
+Movable.ACTION_DEAD_RIGHT = 9;
+Movable.ACTION_DEAD_UP = 10;
+Movable.ACTION_DEAD_DOWN = 11;
 
 Movable.TIME_PER_ANI_FRAME = 250;
 
@@ -48,14 +52,26 @@ Movable.prototype.move = function (direction) {
         if (!this.animating) {
             var pf = {x: 0, y: 0};
 
-            if (direction === Movable.MOVE_LEFT)
-                this.animation.use(Movable.ACTION_LEFT);
-            else if (direction === Movable.MOVE_RIGHT)
-                this.animation.use(Movable.ACTION_RIGHT);
-            else if (direction === Movable.MOVE_UP)
-                this.animation.use(Movable.ACTION_UP);
-            else if (direction === Movable.MOVE_DOWN)
-                this.animation.use(Movable.ACTION_DOWN);
+            if (!GameData.instance().isReverseMode()) {
+                if (direction === Movable.MOVE_LEFT)
+                    this.animation.use(Movable.ACTION_LEFT);
+                else if (direction === Movable.MOVE_RIGHT)
+                    this.animation.use(Movable.ACTION_RIGHT);
+                else if (direction === Movable.MOVE_UP)
+                    this.animation.use(Movable.ACTION_UP);
+                else if (direction === Movable.MOVE_DOWN)
+                    this.animation.use(Movable.ACTION_DOWN);
+            }
+            else {
+                if (direction === Movable.MOVE_LEFT)
+                    this.animation.use(Movable.ACTION_REVERSE_LEFT);
+                else if (direction === Movable.MOVE_RIGHT)
+                    this.animation.use(Movable.ACTION_REVERSE_RIGHT);
+                else if (direction === Movable.MOVE_UP)
+                    this.animation.use(Movable.ACTION_REVERSE_UP);
+                else if (direction === Movable.MOVE_DOWN)
+                    this.animation.use(Movable.ACTION_REVERSE_DOWN);
+            }
 
             if (this.map.canMove(this, direction, this.point, pf)) {
                 this.distanceX = pf.x - this.animation.currentX;

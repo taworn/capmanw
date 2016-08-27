@@ -77,6 +77,7 @@ PlayScene.prototype.render = function () {
         var timeUsed = Math.floor(performance.now() - this.timeBegin);
         this.timeBegin = performance.now();
         //console.log("used " + timeUsed + " ms");
+        GameData.instance().update(timeUsed);
         this.movDivoes[0].play(timeUsed);
         this.movDivoes[1].play(timeUsed);
         this.movDivoes[2].play(timeUsed);

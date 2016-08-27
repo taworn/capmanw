@@ -6,6 +6,8 @@
 function GameData() {
     GameData.singleton = this;
     this.score = 0;
+    this.reverseMode = false;
+    this.reverseTime = 0;
     this.divoLife = 0;
     this.divoList = [];
 }
@@ -14,6 +16,7 @@ function GameData() {
  * Clears data.
  */
 GameData.prototype.clear = function () {
+    this.reverseMode = false;
     this.divoLife = 5;
     this.divoList = [];
 };
@@ -73,13 +76,36 @@ GameData.prototype.checkAllDivoDead = function () {
 GameData.prototype.getBonus = function (item) {
     if (item === 0x01) {
         this.score += 10;
+        console.log("score + 10");
     }
     else if (item === 0x02) {
         this.score += 100;
+        console.log("score + 100");
+        this.reverseMode = true;
+        this.reverseTime = 1000 * 3;
     }
 };
 
 GameData.instance = function () {
     return GameData.singleton;
+};
+
+/**
+ * Checks current time is reverse mode.
+ */
+GameData.prototype.isReverseMode = function () {
+    return this.reverseMode;
+};
+
+/**
+ * Updates current time frame.
+ */
+GameData.prototype.update = function (timeUsed) {
+    if (this.reverseMode) {
+        this.reverseTime -= timeUsed;
+        if (this.reverseTime <= 0)
+            this.reverseMode = false;
+        console.log("reverseMode: " + this.reverseMode);
+    }
 };
 

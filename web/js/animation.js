@@ -107,3 +107,7 @@ Animation.prototype.playFrame = function (enableX, enableY) {
         this.currentY += this.velocityY;
 };
 
+Animation.prototype.isEnded = function () {
+    return this.ending;
+};
+
