@@ -27,7 +27,9 @@ function PlayScene() {
     this.imagePacman.src = "./res/pacman.png";
 
     GameData.instance().clear();
-    this.map.load();
+    this.map.load(debugMapResource());
+    //this.map.load(test0MapResource());
+    //this.map.load(test1MapResource());
     for (var i = 0; i < 4; i++) {
         this.movDivoes[i].setId(i);
         this.movDivoes[i].setMap(this.map);
@@ -87,12 +89,18 @@ PlayScene.prototype.render = function () {
 
         // combines matrices
         var viewMatrix = mat4.create();
-        mat4.lookAt(viewMatrix
-                //, vec3.fromValues(this.movHero.animation.currentX, this.movHero.animation.currentY, 1.5)
-                //, vec3.fromValues(this.movHero.animation.currentX, this.movHero.animation.currentY, -5)
-                , vec3.fromValues(0, 0, 1.5)
-                , vec3.fromValues(0, 0, -5)
-                , vec3.fromValues(0, 1, 0));
+        if (this.map.width > 16 || this.map.height > 16) {
+            mat4.lookAt(viewMatrix
+                    , vec3.fromValues(this.movHero.animation.currentX, this.movHero.animation.currentY, 1.5)
+                    , vec3.fromValues(this.movHero.animation.currentX, this.movHero.animation.currentY, -5)
+                    , vec3.fromValues(0, 1, 0));
+        }
+        else {
+            mat4.lookAt(viewMatrix
+                    , vec3.fromValues(0, 0, 1.5)
+                    , vec3.fromValues(0, 0, -5)
+                    , vec3.fromValues(0, 1, 0));
+        }
         var projectionMatrix = mat4.create();
         mat4.ortho(projectionMatrix, -1.0, 1.0, -1.0, 1.0, -1.0, 25.0);
         this.viewProjectMatrix = mat4.create();
