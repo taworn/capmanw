@@ -127,6 +127,12 @@ PlayScene.prototype.render = function () {
         }
     }
 
+    var context = game.getContext();
+    context.font = "normal 32px sans-serif";
+    context.fillStyle = "#ffffff";
+    context.textAlign = "left";
+    context.fillText(GameData.instance().score, 0, 32);
+
     this.computeFPS();
 };
 

@@ -13,7 +13,7 @@ function Divo() {
     this.targetY = 0.0;
     this.currentDirection = 0;
     this.nextDirection = 0;
-    this.timePerMove = 250;
+    this.timePerMove = 350;
     this.timePerDead = 750;
     this.timePerDistance = 0;
     this.timeUsed = 0;

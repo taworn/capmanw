@@ -76,11 +76,9 @@ GameData.prototype.checkAllDivoDead = function () {
 GameData.prototype.getBonus = function (item) {
     if (item === 0x01) {
         this.score += 10;
-        console.log("score + 10");
     }
     else if (item === 0x02) {
         this.score += 100;
-        console.log("score + 100");
         this.reverseMode = true;
         this.reverseTime = 1000 * 3;
     }
