@@ -42,7 +42,7 @@ Sprite.prototype.release = function () {
 /**
  * Binds resources with image.
  */
-Sprite.prototype.bind = function (image, sliceHorz, sliceVert, timeFrame) {
+Sprite.prototype.bind = function (image, sliceHorz, sliceVert) {
     var gl = this.gl;
 
     // binds texture and set pixels
