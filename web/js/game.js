@@ -62,7 +62,7 @@ Game.prototype.switchScene = function () {
             this.scene = new TitleScene();
             break;
         case Game.SCENE_STAGE:
-            //this.scene = new StageScene();
+            this.scene = new StageScene();
             break;
         case Game.SCENE_PLAY:
             this.scene = new PlayScene();

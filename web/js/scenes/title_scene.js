@@ -55,7 +55,7 @@ TitleScene.prototype.release = function () {
 TitleScene.prototype.handleKey = function (e) {
     if (e.keyCode === 13) {
         console.log("key ENTER");
-        Game.instance().changeScene(Game.SCENE_PLAY);
+        Game.instance().changeScene(Game.SCENE_STAGE);
     }
 };
 
