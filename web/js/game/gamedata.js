@@ -6,6 +6,7 @@
 function GameData() {
     GameData.singleton = this;
     this.score = 0;
+    this.stage = 0;
     this.reverseMode = false;
     this.reverseTime = 0;
     this.divoLife = 0;
@@ -13,12 +14,34 @@ function GameData() {
 }
 
 /**
+ * Resets all game data.
+ */
+GameData.prototype.reset = function () {
+    this.score = 0;
+    this.stage = 0;
+    this.clear();
+};
+
+/**
  * Clears data.
  */
 GameData.prototype.clear = function () {
     this.reverseMode = false;
-    this.divoLife = 5;
+    this.divoLife = 5 * (this.stage + 1);
     this.divoList = [];
+};
+
+/**
+ * Advances to next stage.
+ * @return Returns true if next stage, otherwise, it is false and win the game.
+ */
+GameData.prototype.nextStage = function () {
+    if (this.stage < 2) {
+        this.stage++;
+        return true;
+    }
+    else
+        return false;
 };
 
 /**

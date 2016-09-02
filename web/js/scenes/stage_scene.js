@@ -7,6 +7,7 @@ function StageScene() {
     console.log("StageScene created");
     this.timeBegin = performance.now();
     this.timeUsed = 0;
+    console.log("start stage " + GameData.instance().stage + 1);
 }
 
 StageScene.prototype = new Scene();
@@ -32,7 +33,7 @@ StageScene.prototype.render = function () {
     context.font = "bold 64px serif";
     context.fillStyle = "#ffffff";
     context.textAlign = "center";
-    context.fillText("Stage " + 1, game.getScreenWidth() / 2, game.getScreenHeight() / 2);
+    context.fillText("Stage " + (GameData.instance().stage + 1), game.getScreenWidth() / 2, game.getScreenHeight() / 2);
 
     var timeUsed = Math.floor(performance.now() - this.timeBegin);
     this.timeBegin = performance.now();

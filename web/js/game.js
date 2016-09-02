@@ -33,9 +33,10 @@ function Game() {
 Game.SCENE_DEFAULT = 0;
 Game.SCENE_TITLE = 1;
 Game.SCENE_STAGE = 2;
-Game.SCENE_PLAY = 3;
-Game.SCENE_GAMEOVER = 4;
-Game.SCENE_WIN = 5;
+Game.SCENE_NEXT_STAGE = 3;
+Game.SCENE_PLAY = 4;
+Game.SCENE_GAMEOVER = 5;
+Game.SCENE_WIN = 6;
 
 /**
  * Changes the new scene.
@@ -63,6 +64,9 @@ Game.prototype.switchScene = function () {
             break;
         case Game.SCENE_STAGE:
             this.scene = new StageScene();
+            break;
+        case Game.SCENE_NEXT_STAGE:
+            this.scene = new NextStageScene();
             break;
         case Game.SCENE_PLAY:
             this.scene = new PlayScene();

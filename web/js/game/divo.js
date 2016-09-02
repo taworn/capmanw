@@ -65,7 +65,7 @@ Divo.prototype.nextAction = function () {
         else {
             if (GameData.instance().checkAllDivoDead()) {
                 console.log("all Divoes are dead");
-                Game.instance().changeScene(Game.SCENE_WIN);
+                Game.instance().changeScene(Game.SCENE_NEXT_STAGE);
             }
         }
     }
