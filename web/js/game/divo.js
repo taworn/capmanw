@@ -4,6 +4,7 @@
  * A divo class.
  */
 function Divo() {
+    // have to copy from Movable, for now, otherwise, it is bug T_T
     this.point = {x: 0, y: 0};
     this.dead = false;
     this.animating = false;
@@ -45,11 +46,7 @@ Divo.prototype.setId = function (divoId) {
 };
 
 Divo.prototype.nextAction = function () {
-    // ancestor function not work!
-    // just copy code here for now
-    if (!this.dead) {
-        this.move(this.decision(this.nextDirection));
-    }
+    Movable.prototype.nextAction.call(this);
 
     if (this.dead) {
         if (GameData.instance().divoCanRelife()) {
@@ -72,7 +69,7 @@ Divo.prototype.nextAction = function () {
 };
 
 Divo.prototype.kill = function () {
-    this.dead = true;
+    Movable.prototype.kill.call(this);
 
     var p = {x: 0, y: 0};
     var pf = {x: 0, y: 0};
@@ -96,8 +93,7 @@ Divo.prototype.kill = function () {
 };
 
 Divo.prototype.setMap = function (map) {
-    Movable.prototype.setMap(map);
-    this.map = map;
+    Movable.prototype.setMap.call(this, map);
 
     GameData.instance().divoLifeDecrease();
     var pf = {x: 0, y: 0};
@@ -155,9 +151,7 @@ Divo.prototype.decision = function (moveDirection) {
                 randoms[randoms.length] = Movable.MOVE_UP;
             if ((dirs & Movable.MOVE_DOWN) === Movable.MOVE_DOWN)
                 randoms[randoms.length] = Movable.MOVE_DOWN;
-            var min = Math.ceil(0);
-            var max = Math.floor(randoms.length - 1);
-            var r = Math.floor(Math.random() * (max - min)) + min;
+            var r = Math.round(Math.random() * 1000) % randoms.length;
             moveDirection = randoms[r];
         }
     }
@@ -175,9 +169,7 @@ Divo.prototype.decision = function (moveDirection) {
             randoms[randoms.length] = Movable.MOVE_UP;
         if ((dirs & Movable.MOVE_DOWN) === Movable.MOVE_DOWN)
             randoms[randoms.length] = Movable.MOVE_DOWN;
-        var min = Math.ceil(0);
-        var max = Math.floor(randoms.length - 1);
-        var r = Math.floor(Math.random() * (max - min)) + min;
+        var r = Math.round(Math.random() * 1000) % randoms.length;
         moveDirection = randoms[r];
     }
     return moveDirection;

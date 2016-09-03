@@ -4,24 +4,21 @@
  * A movable class.
  */
 function Movable() {
-    // just keep as comment due to bug inheritance
-    /*
-     this.point = {x: 0, y: 0};
-     this.dead = false;
-     this.animating = false;
-     this.distanceX = 0.0;
-     this.distanceY = 0.0;
-     this.targetX = 0.0;
-     this.targetY = 0.0;
-     this.currentDirection = 0;
-     this.nextDirection = 0;
-     this.timePerMove = 250;
-     this.timePerDead = 750;
-     this.timePerDistance = 0;
-     this.timeUsed = 0;
-     this.animation = new Animation();
-     this.map = null;
-     */
+    this.point = {x: 0, y: 0};
+    this.dead = false;
+    this.animating = false;
+    this.distanceX = 0.0;
+    this.distanceY = 0.0;
+    this.targetX = 0.0;
+    this.targetY = 0.0;
+    this.currentDirection = 0;
+    this.nextDirection = 0;
+    this.timePerMove = 250;
+    this.timePerDead = 750;
+    this.timePerDistance = 0;
+    this.timeUsed = 0;
+    this.animation = new Animation();
+    this.map = null;
 }
 
 Movable.MOVE_LEFT = 1;

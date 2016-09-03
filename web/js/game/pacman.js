@@ -4,6 +4,7 @@
  * A pacman class.
  */
 function Pacman() {
+    // have to copy from Movable, for now, otherwise, it is bug T_T
     this.point = {x: 0, y: 0};
     this.dead = false;
     this.animating = false;
@@ -77,21 +78,7 @@ Pacman.prototype.detect = function () {
 };
 
 Pacman.prototype.play = function (timeUsed) {
-    // ancestor function not work!
-    // just copy code here for now
-    if (this.animating) {
-        if (this.timeUsed + timeUsed < this.timePerDistance) {
-            var dx = timeUsed * this.distanceX / this.timePerDistance;
-            var dy = timeUsed * this.distanceY / this.timePerDistance;
-            this.animation.moveBy(dx, dy);
-            this.timeUsed += timeUsed;
-        }
-        else {
-            this.animation.moveTo(this.targetX, this.targetY);
-            this.animating = false;
-            this.nextAction();
-        }
-    }
+    Movable.prototype.play.call(this, timeUsed);
 
     if (this.isDead()) {
         if (this.animation.isEnded())
@@ -100,16 +87,14 @@ Pacman.prototype.play = function (timeUsed) {
 };
 
 Pacman.prototype.kill = function () {
-    // ancestor function not work!
-    // just copy code here for now
-    this.dead = true;
+    Movable.prototype.kill.call(this);
 
     this.animation.use(Movable.ACTION_DEAD_DOWN);
 };
 
 Pacman.prototype.setMap = function (map) {
-    Movable.prototype.setMap(map);
-    this.map = map;
+    Movable.prototype.setMap.call(this, map);
+
     var pf = {x: 0, y: 0};
     this.map.getPacmanStartPosition(this.point, pf);
     this.animation.moveTo(pf.x, pf.y);
