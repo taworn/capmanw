@@ -7,6 +7,10 @@ function GameData() {
     GameData.singleton = this;
     this.score = parseInt(localStorage.getItem("score"));
     this.stage = parseInt(localStorage.getItem("stage"));
+    if (this.score !== this.score)
+        this.score = 0;
+    if (this.stage !== this.stage)
+        this.stage = 0;
     this.reverseMode = false;
     this.reverseTime = 0;
     this.divoLife = 0;
