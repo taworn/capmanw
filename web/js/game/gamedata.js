@@ -5,8 +5,8 @@
  */
 function GameData() {
     GameData.singleton = this;
-    this.score = 0;
-    this.stage = 0;
+    this.score = parseInt(localStorage.getItem("score"));
+    this.stage = parseInt(localStorage.getItem("stage"));
     this.reverseMode = false;
     this.reverseTime = 0;
     this.divoLife = 0;
@@ -29,6 +29,14 @@ GameData.prototype.clear = function () {
     this.reverseMode = false;
     this.divoLife = 5 * (this.stage + 1);
     this.divoList = [];
+};
+
+/**
+ * Saves data.
+ */
+GameData.prototype.save = function () {
+    localStorage.setItem("score", this.score);
+    localStorage.setItem("stage", this.stage);
 };
 
 /**

@@ -7,6 +7,7 @@ function StageScene() {
     console.log("StageScene created");
     this.timeBegin = performance.now();
     this.timeUsed = 0;
+    GameData.instance().save();
     console.log("start stage " + GameData.instance().stage + 1);
 }
 
