@@ -23,11 +23,17 @@ function PlayScene() {
     this.imagePacman.onload = function () {
         self.spritePacman.bind(self.imagePacman, 8, 8);
     };
-    this.imageMap.src = "./res/map0.png";
+    var i = GameData.instance().stage;
+    this.imageMap.src = "./res/map" + (i % 2) + ".png";
     this.imagePacman.src = "./res/pacman.png";
 
     GameData.instance().clear();
-    this.map.load(debugMapResource());
+    var s = "" + (i + 1);
+    while (s.length < 2)
+        s = "0" + s;
+    var methodName = "stage" + s + "MapResource";
+    this.map.load(window[methodName]());
+    //this.map.load(debugMapResource());
     //this.map.load(test0MapResource());
     //this.map.load(test1MapResource());
     for (var i = 0; i < 4; i++) {

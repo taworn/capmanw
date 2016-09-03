@@ -103,7 +103,7 @@ GameData.prototype.getBonus = function (item) {
     else if (item === 0x02) {
         this.score += 100;
         this.reverseMode = true;
-        this.reverseTime = 1000 * 3;
+        this.reverseTime = 2500;
     }
 };
 
